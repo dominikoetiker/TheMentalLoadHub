@@ -4,7 +4,7 @@
 
 ## About the Project
 
-Für Details zur Projektplanung und dem aktuellen Stand siehe: [The Mental Load Hub - GitHub Projects](https://github.com/users/dominikoetiker/projects/1)
+For details on project planning and the current status, see: [The Mental Load Hub - GitHub Projects](https://github.com/users/dominikoetiker/projects/1)
 
 The goal of The Mental Load Hub is to streamline household management by offering features that help users:
 - Organize and assign daily tasks with priorities and deadlines.
@@ -24,6 +24,16 @@ This project is currently in development. The repository will evolve as new feat
 - **Backend:** Python with Flask
 - **Frontend:** TypeScript with React
 - **Mobile:** React Native
+
+## Diagrams
+
+### ERD
+
+![TheMentalLoadHub_ERD.svg](docs/diagrams/erd/TheMentalLoadHub_ERD.png)
+
+### Use Case Diagram (UML)
+
+![use_case.svg](docs/diagrams/uml/use_case/use_case.svg)
 
 ## License
 
