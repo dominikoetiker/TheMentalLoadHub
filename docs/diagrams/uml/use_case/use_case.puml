@@ -1,0 +1,222 @@
+@startuml
+left to right direction
+
+
+skinparam usecase {
+  FontSize 11
+}
+
+' Define primary actors
+actor Root <<System Administrator>>
+actor Administrator <<Household Manager>>
+actor User <<Household Member>>
+
+Administrator -|> User
+
+' Mental Load Hub Application
+rectangle "The Mental Load Hub" {
+
+  ' Household Setup (only Root performs these)
+  rectangle "System Setup" {
+    (Create Household) as UC_CreateHousehold
+    (Create Initial Admin Account) as UC_CreateAdminAccount
+    (Send Invitation to Administrator) as UC_SendInvitation
+    (Remove Household) as UC_RemoveHousehold
+
+    Root ----> UC_CreateHousehold
+    Root ----> UC_CreateAdminAccount
+    Root ----> UC_SendInvitation
+    Root ----> UC_RemoveHousehold
+  }
+
+  rectangle "Setup" {
+
+    ' Account Operations (for all users)
+    rectangle "Account Operations" {
+      (Register Account) as UC_Register
+      (Login) as UC_Login
+      (Logout) as UC_Logout
+      (Change Credentials) as UC_ChangeCredentials
+      (Reset Password) as UC_ResetPassword
+      (Verify Household Membership) as UC_VerifyHousehold
+      (User Authentication) as UC_UserAuthentication
+
+      User ----> UC_Register
+      User ----> UC_Login
+      User ----> UC_ChangeCredentials
+      User ----> UC_ResetPassword
+      User ----> UC_Logout
+
+      ' Registration includes verifying household membership
+      UC_Register ..> UC_VerifyHousehold: <<include>>
+      UC_Login ..> UC_UserAuthentication : <<include>>
+      UC_ChangeCredentials ..> UC_UserAuthentication : <<include>>
+    }
+
+    ' Household Administration (Admin-centric)
+    rectangle "Household Administration" {
+      (Change Household Name) as UC_ChangeHouseholdName
+      (Invite New Member) as UC_InviteMember
+      (Remove Member) as UC_RemoveMember
+      (Assign Administrator Role) as UC_AssignAdminRole
+      (View Household Members) as UC_ViewHouseholdMembers
+
+      Administrator --> UC_ChangeHouseholdName
+      Administrator --> UC_InviteMember
+      Administrator --> UC_RemoveMember
+      Administrator --> UC_AssignAdminRole
+      User ----> UC_ViewHouseholdMembers
+    }
+
+    ' Reminders & Notifications
+    rectangle "Reminders & Notifications" {
+      (Set Reminders) as UC_SetReminders
+      (Receive Push Notifications) as UC_PushNotifications
+      User ----> UC_SetReminders
+      User ----> UC_PushNotifications
+    }
+
+    ' Localization & Internationalization
+    rectangle "Localization & Internationalization" {
+      (Select Preferred Language) as UC_SelectLanguage
+      (Adapt to Regional Settings) as UC_RegionalSettings
+      User ----> UC_SelectLanguage
+      User ----> UC_RegionalSettings
+    }
+  }
+
+  ' Task Management
+  rectangle "Task Management" {
+    ' Create Task
+    (Create Task) as UC_CreateTask
+    (Edit Task) as UC_EditTask
+    (View Task Overview) as UC_ViewTaskOverview
+    (Open Task) as UC_OpenTask
+    (Tag Task with Area of Responsibility) as UC_TagTaskArea
+    (Assign Task to Member) as UC_AssignTaskMember
+    (Link Task to Project) as UC_LinkTaskProject
+    (Add/Remove Task Helper) as UC_AddRemoveTaskHelper
+    (Set Task Status) as UC_SetTaskStatus
+    (Delete Task) as UC_DeleteTask
+
+    User ----> UC_CreateTask
+    User ----> UC_EditTask
+    User ----> UC_ViewTaskOverview
+    User ----> UC_OpenTask
+    User ----> UC_TagTaskArea
+    User ----> UC_AssignTaskMember
+    User ----> UC_LinkTaskProject
+    User ----> UC_AddRemoveTaskHelper
+    User ----> UC_DeleteTask
+
+    ' Set Status
+    UC_CreateTask ....> UC_SetTaskStatus : <<include>>
+    UC_EditTask <.... UC_SetTaskStatus : <<extend>>
+
+    ' Kanban Board
+    rectangle "Kanban Board" {
+      (View Kanban Board) as UC_ViewKanban
+      (Drag & Drop Tasks) as UC_DragDropTasks
+      UC_ViewTaskOverview <.. UC_ViewKanban : <<extend>>
+      UC_ViewKanban <.. UC_DragDropTasks : <<extend>>
+      UC_DragDropTasks ..> UC_SetTaskStatus : <<include>>
+    }
+  }
+
+  ' Responsibilities (Areas of Responsibility)
+  rectangle "Responsibilities" {
+    (Create Area of Responsibility) as UC_CreateArea
+    (Edit Area of Responsibility) as UC_EditArea
+    (View Areas of Responsibility Overview) as UC_ViewAreasOverview
+    (Open Area of Responsibility) as UC_OpenArea
+    (Assign Area to Member) as UC_AssignAreaMember
+    (Delete Area of Responsibility) as UC_DeleteArea
+
+    User ----> UC_CreateArea
+    User ----> UC_EditArea
+    User ----> UC_ViewAreasOverview
+    User ----> UC_OpenArea
+    User ----> UC_AssignAreaMember
+    User ----> UC_DeleteArea
+  }
+
+  ' Shopping Lists
+  rectangle "Shopping Lists" {
+    (Create Shopping List) as UC_CreateShoppingList
+    (Edit Shopping List) as UC_EditShoppingList
+    (View Shopping Lists Overview) as UC_ViewShoppingListsOverview
+    (Open Shopping List) as UC_OpenShoppingList
+    (Tag Shopping List with Area of Responsibility) as UC_TagShoppingListArea
+    (Link Shopping List to Project) as UC_LinkShoppingListProject
+    (Add/Edit/Remove Shopping List Items) as UC_AddEditRemoveShoppingListItems
+    (Categorize Shopping List Items) as UC_CategorizeShoppingListItems
+    (Mark Shopping List Item as Completed) as UC_MarkShoppingItemCompleted
+    (Delete Shopping List) as UC_DeleteShoppingList
+
+    User ----> UC_CreateShoppingList
+    User ----> UC_EditShoppingList
+    User ----> UC_ViewShoppingListsOverview
+    User ----> UC_OpenShoppingList
+    User ----> UC_TagShoppingListArea
+    User ----> UC_LinkShoppingListProject
+    User ----> UC_AddEditRemoveShoppingListItems
+    User ----> UC_CategorizeShoppingListItems
+    User ----> UC_MarkShoppingItemCompleted
+    User ----> UC_DeleteShoppingList
+  }
+
+  ' Custom Lists
+  rectangle "Custom Lists" {
+    (Create Custom List) as UC_CreateCustomList
+    (Edit Custom List) as UC_EditCustomList
+    (View Custom List Overview) as UC_ViewCustomListOverview
+    (Open Custom List) as UC_OpenCustomList
+    (Tag Custom List with Area of Responsibility) as UC_TagCustomListArea
+    (Link Custom List to Project) as UC_LinkCustomListProject
+    (Add/Edit/Remove Custom List Items) as UC_AddEditRemoveCustomListItems
+    (Format as Checklist) as UC_FormatCustomListChecklist
+    (Organize Items into Sub-Items) as UC_OrganizeCustomListSubItems
+    (Delete Custom List) as UC_DeleteCustomList
+
+    User ----> UC_CreateCustomList
+    User ----> UC_EditCustomList
+    User ----> UC_ViewCustomListOverview
+    User ----> UC_OpenCustomList
+    User ----> UC_TagCustomListArea
+    User ----> UC_LinkCustomListProject
+    User ----> UC_AddEditRemoveCustomListItems
+    User ----> UC_FormatCustomListChecklist
+    User ----> UC_OrganizeCustomListSubItems
+    User ----> UC_DeleteCustomList
+  }
+
+  ' Project Management
+  rectangle "Project Management" {
+    (Create Project) as UC_CreateProject
+    (Edit Project) as UC_EditProject
+    (View Projects Overview) as UC_ViewProjectsOverview
+    (Open Project) as UC_OpenProject
+    (Tag Project with Area of Responsibility) as UC_TagProjectArea
+    (Assign Project Roles to Members) as UC_AssignProjectRolesMembers
+    (Create/Link Tasks to Project) as UC_CreateLinkTasks
+    (Create/Link Shopping Lists to Project) as UC_CreateLinkShoppingLists
+    (Create/Link Custom Lists to Project) as UC_CreateLinkCustomLists
+    (Mark Project as Done) as UC_MarkProjectDone
+    (Delete Project) as UC_DeleteProject
+
+    User ----> UC_CreateProject
+    User ----> UC_EditProject
+    User ----> UC_ViewProjectsOverview
+    User ----> UC_OpenProject
+    User ----> UC_TagProjectArea
+    User ----> UC_AssignProjectRolesMembers
+    User ----> UC_CreateLinkTasks
+    User ----> UC_CreateLinkShoppingLists
+    User ----> UC_CreateLinkCustomLists
+    User ----> UC_MarkProjectDone
+    User ----> UC_DeleteProject
+
+  }
+}
+
+@enduml
