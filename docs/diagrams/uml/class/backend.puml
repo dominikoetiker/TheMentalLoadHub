@@ -16,8 +16,8 @@ package "Model" {
         + updated_at: datetime.datetime {readOnly}
         ' methods --------------------------
         + create(name: str): Household
-        + remove(): None
-        + get_members(): List[User]
+        + delete(): None
+        + read_members(): List[User]
     }
 
     '--------------------------------
@@ -37,13 +37,13 @@ package "Model" {
             + updated_at: datetime.datetime {readOnly}
             ' methods --------------------------
             + create(household: Household, email: str, username: str, plain_password: str): User
-            + get_email(): str
-            + set_email(new_email: str): None
+            + read_email(): str
+            + update_email(new_email: str): None
             - __validate_email(email: str): bool
-            + remove(): None
+            + delete(): None
             + reset_password(): None
             + login(password: str): bool
-            + set_password(new_plain_password: str): None
+            + update_password(new_plain_password: str): None
             + verify_password(plain_password: str): bool
             + logout(): None
         }
@@ -72,7 +72,7 @@ package "Model" {
             + updated_at: datetime.datetime {readOnly}
             ' methods --------------------------
             + create(household: Household, title: str, description: str): AreaOfResponsibility
-            + remove(): None
+            + delete(): None
         }
     }
 
@@ -94,12 +94,12 @@ package "Model" {
             + done_at: datetime.datetime {readOnly}
             ' methods --------------------------
             + create(created_by: User, title: str, description: str): Project
-            + remove(): None
-            + get_goals(): List[Goal]
-            + get_users(): List[User_Project]
-            + get_tasks(): List[Task]
-            + get_custom_lists(): List[CustomList]
-            + get_shopping_lists(): List[ShoppingList]
+            + delete(): None
+            + read_goals(): List[Goal]
+            + read_users(): List[User_Project]
+            + read_tasks(): List[Task]
+            + read_custom_lists(): List[CustomList]
+            + read_shopping_lists(): List[ShoppingList]
         }
         Class ProjectGoal {
             ' attributes --------------------------
@@ -109,7 +109,7 @@ package "Model" {
             + description: str
             ' methods --------------------------
             + create(title: str, description: str): ProjectGoal
-            + remove()
+            + delete()
         }
         Class ProjectRole {
             ' attributes --------------------------
@@ -124,7 +124,7 @@ package "Model" {
             + role: ProjectRole
             ' methods --------------------------
             + create(user: User, project: Project, project_role: ProjectRole): User_Project
-            + remove(): None
+            + delete(): None
         }
 
         ' Relations inside Domain
@@ -152,8 +152,8 @@ package "Model" {
             + updated_at: datetime.datetime {readOnly}
             ' methods --------------------------
             + create(created_by: User, title: str, description: str): CustomList
-            + get_items(): List[CustomList_CustomListItem]
-            + remove(): None
+            + read_items(): List[CustomList_CustomListItem]
+            + delete(): None
 
         }
         Class CustomListItem {
@@ -163,7 +163,7 @@ package "Model" {
             + name: str
             ' methods --------------------------
             + create(household: Household, name: str): CustomListItem
-            + remove(): None
+            + delete(): None
         }
         Class CustomList_CustomListItem {
             ' attributes --------------------------
@@ -177,7 +177,7 @@ package "Model" {
             + is_done: bool
             ' methods --------------------------
             + create(list: CustomList, item: CustomListItem, quantity: float, unit: str, parent: CustomListItem): CustomList_CustomListItem
-            + remove(): None
+            + delete(): None
         }
 
         ' Relations inside Domain
@@ -206,7 +206,7 @@ package "Model" {
             + done_at: datetime.datetime {readOnly}
             ' methods --------------------------
             + create(created_by: User, title: str, is_recurring: bool, description: str): Task
-            + remove(): None
+            + delete(): None
         }
         Class Priority {
             + id: int {readOnly}
@@ -223,7 +223,7 @@ package "Model" {
             + task: Task
             ' methods --------------------------
             + create(user: User, task: Task): Task_TaskHelper
-            + remove(): None
+            + delete(): None
         }
         Class RecurrenceCycle {
             + id: int {readOnly}
@@ -237,7 +237,7 @@ package "Model" {
             + is_active: bool
             ' methods --------------------------
             + create(created_by: User, title: str, description: str): RecurringTask
-            + remove(): None
+            + delete(): None
         }
         Class NonRecurringTask {
             ' attributes --------------------------
@@ -245,7 +245,7 @@ package "Model" {
             + deadline: datetime.datetime
             ' methods --------------------------
             + create(created_by: User, title: str, description: str): NonRecurringTask
-            + remove(): None
+            + delete(): None
         }
 
         ' Relations inside Domain
@@ -275,8 +275,8 @@ package "Model" {
             + updated_at: datetime.datetime {readOnly}
             ' methods --------------------------
             + create(created_by: User, title: str): ShoppingList
-            + get_items(): List[ShoppingList_ShoppingListItem]
-            + remove(): None
+            + read_items(): List[ShoppingList_ShoppingListItem]
+            + delete(): None
         }
         Class ShoppingListItemCategory {
             ' attributes --------------------------
@@ -285,8 +285,8 @@ package "Model" {
             + name: str
             ' methods --------------------------
             + create(household: Household, name: str): ShoppingListItemCategory
-            + get_items(): List[ShoppingListItem]
-            + remove(): None
+            + read_items(): List[ShoppingListItem]
+            + delete(): None
         }
         Class ShoppingListItem {
             ' attributes --------------------------
@@ -296,7 +296,7 @@ package "Model" {
             + title: str
             ' methods --------------------------
             + create(household: Household, title: str, category: ShoppingListItemCategory): ShoppingListItem
-            + remove(): None
+            + delete(): None
         }
         Class ShoppingList_ShoppingListItem {
             ' attributes --------------------------
@@ -309,7 +309,7 @@ package "Model" {
             + is_done: bool
             ' methods --------------------------
             + create(list: ShoppingList, item: ShoppingListItem, quantity: float, unit: str): ShoppingList_ShoppingListItem
-            + remove(): None
+            + delete(): None
         }
 
         ' Relations inside Domain
