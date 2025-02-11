@@ -65,6 +65,24 @@ package "Models" {
     '--------------------------------
     ' AreaOfResponsibility
     '--------------------------------
+    Class Invitation {
+        ' attributes --------------------------
+        + id: int {readOnly}
+        + household: Household {readOnly}
+        + household_role: HouseholdRole {readOnly}
+        + email: str {readOnly}
+        - __hashed_key: str
+        + is_used: bool
+        + created_at: datetime.datetime {readOnly}
+        ' methods --------------------------
+        + create(household: Household, household_role: HouseholdRole, email: str, hashed_key: str): Invitation
+        + verify_key(plain_key): bool
+        + use(): None
+    }
+
+    '--------------------------------
+    ' AreaOfResponsibility
+    '--------------------------------
     Class AreaOfResponsibility {
         ' attributes --------------------------
         + id: int {readOnly}
@@ -325,10 +343,13 @@ package "Models" {
     ' Relations inside Models Domain (Cross-Sub-Domains)
     '--------------------------------
     User "0..*" ---* "1" Household : "belongs to"
+    Invitation "0..*" ---* "1" Household : "belongs to"
     AreaOfResponsibility "0..*" ---* "1" Household : "belongs to"
     CustomListItem "0..*" ---* "1" Household : "belongs to"
     ShoppingListItem "0..*" ---* "1" Household : "belongs to"
     ShoppingListItemCategory "0..*" ---* "1" Household : "belongs to"
+
+    Invitation "0..*" -- "1" HouseholdRole : "assigned"
 
     User "1" --- "0..*" Task : "creator"
     User "1" --- "0..*" Task : "assignee"
