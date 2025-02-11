@@ -35,6 +35,10 @@ This project is currently in development. The repository will evolve as new feat
 
 ![use_case.svg](docs/diagrams/uml/use_case/use_case.svg)
 
+### Class Diagram for backend (MVP-Focus) (UML)
+
+![backend.svg](docs/diagrams/uml/class/backend.svg)
+
 ## License
 
 This project is licensed under the MIT License.
