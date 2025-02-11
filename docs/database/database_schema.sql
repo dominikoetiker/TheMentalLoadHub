@@ -22,6 +22,7 @@ DROP TABLE IF EXISTS ProjectGoal;
 DROP TABLE IF EXISTS Project;
 DROP TABLE IF EXISTS AreaOfResponsibility;
 DROP TABLE IF EXISTS User;
+DROP TABLE IF EXISTS Invitation;
 DROP TABLE IF EXISTS HouseholdRole;
 DROP TABLE IF EXISTS Household;
 
@@ -45,6 +46,21 @@ CREATE TABLE HouseholdRole
 INSERT INTO HouseholdRole (household_role_name)
 VALUES ('Administrator'),
        ('User');
+
+CREATE TABLE Invitation
+(
+    invitation_id INT AUTO_INCREMENT,
+    household_id INT NOT NULL ,
+    household_role_id INT NOT NULL ,
+    email VARCHAR(255) NOT NULL ,
+    hashed_key VARCHAR(255) NOT NULL ,
+    is_used BOOLEAN,
+    created_at TIMESTAMP DEFAULT current_timestamp,
+    PRIMARY KEY (invitation_id),
+    FOREIGN KEY (household_id) REFERENCES Household (household_id) ON DELETE CASCADE ,
+    FOREIGN KEY (household_role_id) REFERENCES HouseholdRole (household_role_id),
+    UNIQUE (household_id, email)
+);
 
 CREATE TABLE User
 (
