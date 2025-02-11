@@ -381,9 +381,19 @@ package Services {
         ' User story #18:
         + invite_member(household_id: int, email: str, role_id: int): None
     }
+
+    Class InvitationService {
+        ' User story #18:
+        + create_invitation(household_id: int, email: str, role_id: int): Invitation
+        ' User story #18:
+        - __send_invitation_email(email: str, invitation_link: str): None
+        ' User story #18, #23:
+        + verify_invitation(plain_key: str, email: str): Invitation
+    }
+
     Class UserService {
         ' User story #23
-        + create_user(household_id: int, email: str, username: str, plain_password: str, role_id: int): User
+        + create_user(invitation: Invitation, username: str, plain_password: str): User
         ' User story #27, #34, #36, #37:
         + read_user(user_id: int): User
         ' User story #30:
@@ -418,6 +428,7 @@ package Services {
         ' User story #19:
         + delete_user(user_id: int): None
     }
+
     Class TaskService {
         ' User story #34, #35:
         + create_task(created_by: User, title: str, is_recurring: bool, description: str): Task
@@ -455,6 +466,7 @@ package Services {
         ' User story #49:
         + delete_task(task_id): None
     }
+
     Class RecurringTaskService {
         ' User story #38:
         + create_recurring_task(created_by: User, title: str, recurrence_cycle_id: int, recurrence_interval: int, description: str): RecurringTask
@@ -471,6 +483,7 @@ package Services {
         ' User story #47:
         + transform_non_recurring_task_to_recurring_task(task: Task, recurrence_cycle_id: int, recurrence_interval: int): RecurringTask
     }
+
     Class NonRecurringTaskService {
         ' User story #41:
         + create_non_recurring_task(created_by: User, title: str, deadline: datetime.date, description: str): NonRecurringTask
