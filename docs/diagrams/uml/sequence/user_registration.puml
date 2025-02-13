@@ -1,10 +1,15 @@
 @startuml
 
+skinparam BoxPadding 20
+
 actor Administrator as Admin
 actor "New User" as User
 
+box Frontend
 participant "Frontend (React)" as FE
+endbox
 
+box Backend
 participant "/invitations route\n (Flask Blueprint)" as IR
 participant "/register route\n (Flask Blueprint)" as RR
 participant "/users route\n (Flask Blueprint)" as UR
@@ -14,151 +19,156 @@ participant "UserService" as US
 
 participant "Invitation Model Object \n (SQLAlchemy\n to Database)" as IM
 participant "User Model Object \n (SQLAlchemy\n to Database)" as UM
+endbox
 
+box External Service
 participant "Email Service" as Mail
+endbox
 
-'--- Invitation Process (Admin) ---
-Admin -> FE : Initiates invitation
+== Invitation Process (Admin) ==
+
+Admin -[#red]> FE : Initiates invitation
     activate FE
-    FE -> IR : HTTP Request: POST /invitations {email, role_id}
+    FE -[#red]> IR : HTTP Request: POST /invitations {email, role_id}
         activate IR
-        IR -> IR : extracts household_id from Administrator User object (sender of invitation)
+        IR -[#red]> IR : extracts household_id from Administrator User object (sender of invitation)
         activate IR
-        IR -> IS : invite_member(household_id, email, role_id)
+        IR -[#red]> IS : invite_member(household_id, email, role_id)
             deactivate IR
             activate IS
-            IS -> IS : __generate_unique_token()
+            IS -[#red]> IS : __generate_unique_token()
             activate IS
             deactivate IS
-            IS -> IS : __create_invitation(household_id, email, role_id)
+            IS -[#red]> IS : __create_invitation(household_id, email, role_id)
             activate IS
-            IS -> IM : create(household, household_role, email, plain_token)
+            IS -[#red]> IM : create(household, household_role, email, plain_token)
                 activate IM
-                IM -> IM : __hash_token(plain_token) (for storage)
+                IM -[#red]> IM : __hash_token(plain_token) (for storage)
                 activate IM
                 deactivate IM
-            IS <-- IM : Invitation object
+            IS <-[#blue]- IM : Invitation object
             deactivate IM
             deactivate IS
-            IS -> IS : __generate_invitation_link() [including plain_token]
+            IS -[#red]> IS : __generate_invitation_link() [including plain_token]
             activate IS
             deactivate IS
-            IS -> IS : __send_invitation_email(email: str, invitation_link: str)
+            IS -[#red]> IS : __send_invitation_email(email: str, invitation_link: str)
             activate IS
-            IS -> Mail : calls Mail service to send Email
+            IS -[#red]> Mail : calls Mail service to send Email
                 activate Mail
                 deactivate IS
                 deactivate IS
-    FE <-- IR : HTTP Response: Success
+    FE <-[#blue]- IR : HTTP Response: Success
     deactivate IR
-Admin <-- FE : Displays success
+Admin <-[#blue]- FE : Displays success
 deactivate FE
 User <- Mail : send invitation link to new User
 deactivate Mail
 
-'--- User Registration Process ---
-User -> FE : Clicks invitation link (/register?token=...&email=...)
+== User Registration Process ==
+
+User -[#red]> FE : Clicks invitation link (/register?token=...&email=...)
     activate FE
-    FE -> RR : HTTP Request: GET /register?token=<token>&email=<email>
+    FE -[#red]> RR : HTTP Request: GET /register?token=<token>&email=<email>
         activate RR
-        RR -> IS : verify_invitation(plain_token, email)
+        RR -[#red]> IS : verify_invitation(plain_token, email)
             activate IS
-            IS -> IM : query invitation by email, is_used=false, created_after expiration time period before current time
+            IS -[#red]> IM : query invitation by email, is_used=false, created_after expiration time period before current time
                 activate IM
 
 alt invitation does not exist
-            IS <-- IM : null
-        RR <-- IS : null
-    FE <-- RR : HTTP Response: Error
-User <-- FE : Error Message: Invitation not valid
+            IS <-[#blue]- IM : null
+        RR <-[#blue]- IS : null
+    FE <-[#blue]- RR : HTTP Response: Error
+User <-[#blue]- FE : Error Message: Invitation not valid
 
 else Invitation does exist
-            IS <-- IM : Invitation object
+            IS <-[#blue]- IM : Invitation object
             deactivate IM
-            IS -> IM : verify_token(plain_token)
+            IS -[#red]> IM : verify_token(plain_token)
                 activate IM
-                IM -> IM : __hash_token(plain_token)
+                IM -[#red]> IM : __hash_token(plain_token)
                 activate IM
                 deactivate IM
 
 alt invitation token not verified
-            IS <-- IM : False
-        RR <-- IS : null
-    FE <-- RR : HTTP Response: Error
-User <-- FE : Error Message: Invitation not valid
+            IS <-[#blue]- IM : False
+        RR <-[#blue]- IS : null
+    FE <-[#blue]- RR : HTTP Response: Error
+User <-[#blue]- FE : Error Message: Invitation not valid
 
 else invitation token verified
-            IS <-- IM : True
+            IS <-[#blue]- IM : True
             deactivate IM
-        RR <-- IS : Invitation object
+        RR <-[#blue]- IS : Invitation object
         deactivate IS
-    FE <-- RR : HTTP Response: Registration data (email, household_id, role_id) / Error
+    FE <-[#blue]- RR : HTTP Response: Registration data (email, household_id, role_id) / Error
     deactivate RR
-User <-- FE : Registration form (username, password) (prefilled and immutable: email, household_id and role_id)
+User <-[#blue]- FE : Registration form (username, password) (prefilled and immutable: email, household_id and role_id)
 deactivate FE
 
 end
 end
 
-User -> FE : Fills out registration form (username, password)
+User -[#red]> FE : Fills out registration form (username, password)
     activate FE
-    FE -> UR : HTTP Request: POST /users {username, password, email, household_id, role_id, token}
+    FE -[#red]> UR : HTTP Request: POST /users {username, password, email, household_id, role_id, token}
         activate UR
-        UR -> IS: verify_invitation(plain_token, email) check if token is still valid
+        UR -[#red]> IS: verify_invitation(plain_token, email) check if token is still valid
             activate IS
-            IS -> IM : query invitation by email, is_used=false, created_after expiration time period before current time
+            IS -[#red]> IM : query invitation by email, is_used=false, created_after expiration time period before current time
                 activate IM
 
 alt invitation does not exist
-            IS <-- IM : null
-        UR <-- IS : null
-    FE <-- UR : HTTP Response: Error
-User <-- FE : Error Message: Invitation not valid
+            IS <-[#blue]- IM : null
+        UR <-[#blue]- IS : null
+    FE <-[#blue]- UR : HTTP Response: Error
+User <-[#blue]- FE : Error Message: Invitation not valid
 
 else Invitation does exist
-            IS <-- IM : Invitation object
+            IS <-[#blue]- IM : Invitation object
             deactivate IM
-            IS -> IM : verify_token(plain_token)
+            IS -[#red]> IM : verify_token(plain_token)
                 activate IM
-                IM -> IM : __hash_token(plain_token)
+                IM -[#red]> IM : __hash_token(plain_token)
                 activate IM
                 deactivate IM
 
 alt invitation token not verified
-            IS <-- IM : False
-        UR <-- IS : null
-    FE <-- UR : HTTP Response: Error
-User <-- FE : Error Message: Invitation not valid
+            IS <-[#blue]- IM : False
+        UR <-[#blue]- IS : null
+    FE <-[#blue]- UR : HTTP Response: Error
+User <-[#blue]- FE : Error Message: Invitation not valid
 
 else invitation token verified
-            IS <-- IM : True
+            IS <-[#blue]- IM : True
             deactivate IM
-        UR <-- IS : Invitation object (or null)
+        UR <-[#blue]- IS : Invitation object (or null)
         deactivate IS
-        UR -> US : create_user(invitation, username, plain_password)
+        UR -[#red]> US : create_user(invitation, username, plain_password)
             activate US
-            US -> UM : create(household, email, username, plain_password)
+            US -[#red]> UM : create(household, email, username, plain_password)
                 activate UM
-                UM -> UM : Hash password
+                UM -[#red]> UM : Hash password
                 activate UM
                 deactivate UM
-            US <-- UM : User object
+            US <-[#blue]- UM : User object
             deactivate UM
-        UR <-- US : User object
+        UR <-[#blue]- US : User object
         deactivate US
-        UR -> IS : mark_invitation_as_used(invitation_id)
+        UR -[#red]> IS : mark_invitation_as_used(invitation_id)
             activate IS
-            IS -> IM : query invitation by id
+            IS -[#red]> IM : query invitation by id
                 activate IM
-            IS <-- IM : Invitation object
+            IS <-[#blue]- IM : Invitation object
             deactivate IM
-            IS -> IM : mark_as_used()
+            IS -[#red]> IM : mark_as_used()
                 activate IM
             deactivate IM
         deactivate IS
-    FE <-- UR : HTTP Response: Success/Redirection to login / Error
+    FE <-[#blue]- UR : HTTP Response: Success/Redirection to login / Error
     deactivate UR
-User <-- FE : Redirects to login / Displays error message
+User <-[#blue]- FE : Redirects to login / Displays error message
 deactivate FE
 
 end
