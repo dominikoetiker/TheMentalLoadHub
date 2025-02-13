@@ -62,7 +62,7 @@ Admin -[#red]> FE : Initiates invitation
     deactivate IR
 Admin <-[#blue]- FE : Displays success
 deactivate FE
-User <- Mail : send invitation link to new User
+User <[#red]- Mail : send invitation link to new User
 deactivate Mail
 
 == User Registration Process ==
@@ -168,7 +168,7 @@ else invitation token verified
         deactivate IS
     FE <-[#blue]- UR : HTTP Response: Success/Redirection to login / Error
     deactivate UR
-User <-[#blue]- FE : Redirects to login / Displays error message
+User <[#red]- FE : Redirects to login
 deactivate FE
 
 end
