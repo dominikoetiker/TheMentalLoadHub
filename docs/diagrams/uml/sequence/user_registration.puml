@@ -47,16 +47,14 @@ Admin -> FE : Initiates invitation
             activate IS
             IS -> Mail : calls Mail service to send Email
                 activate Mail
-                User <- Mail : send invitation link to new User
-            IS <-- Mail : Success/Failure
-            deactivate Mail
-            deactivate IS
-        IR <-- IS  : Success/Failure
-        deactivate IS
-    FE <-- IR : HTTP Response: Success/Failure
+                deactivate IS
+                deactivate IS
+    FE <-- IR : HTTP Response: Success
     deactivate IR
-Admin <-- FE : Displays success/failure message
+Admin <-- FE : Displays success
 deactivate FE
+User <- Mail : send invitation link to new User
+deactivate Mail
 
 '--- User Registration Process ---
 User -> FE : Clicks invitation link (/register?token=...&email=...)
@@ -67,21 +65,40 @@ User -> FE : Clicks invitation link (/register?token=...&email=...)
             activate IS
             IS -> IM : query invitation by email, is_used=false, created_after expiration time period before current time
                 activate IM
-            IS <-- IM : Invitation object (or null)
+
+alt invitation does not exist
+            IS <-- IM : null
+        RR <-- IS : null
+    FE <-- RR : HTTP Response: Error
+User <-- FE : Error Message: Invitation not valid
+
+else Invitation does exist
+            IS <-- IM : Invitation object
             deactivate IM
             IS -> IM : verify_token(plain_token)
                 activate IM
                 IM -> IM : __hash_token(plain_token)
                 activate IM
                 deactivate IM
-            IS <-- IM : Success or failure
+
+alt invitation token not verified
+            IS <-- IM : False
+        RR <-- IS : null
+    FE <-- RR : HTTP Response: Error
+User <-- FE : Error Message: Invitation not valid
+
+else invitation token verified
+            IS <-- IM : True
             deactivate IM
-        RR <-- IS : Invitation object (or null)
+        RR <-- IS : Invitation object
         deactivate IS
     FE <-- RR : HTTP Response: Registration data (email, household_id, role_id) / Error
     deactivate RR
 User <-- FE : Registration form (username, password) (prefilled and immutable: email, household_id and role_id)
 deactivate FE
+
+end
+end
 
 User -> FE : Fills out registration form (username, password)
     activate FE
@@ -91,14 +108,30 @@ User -> FE : Fills out registration form (username, password)
             activate IS
             IS -> IM : query invitation by email, is_used=false, created_after expiration time period before current time
                 activate IM
-            IS <-- IM : Invitation object (or null)
+
+alt invitation does not exist
+            IS <-- IM : null
+        UR <-- IS : null
+    FE <-- UR : HTTP Response: Error
+User <-- FE : Error Message: Invitation not valid
+
+else Invitation does exist
+            IS <-- IM : Invitation object
             deactivate IM
             IS -> IM : verify_token(plain_token)
                 activate IM
                 IM -> IM : __hash_token(plain_token)
                 activate IM
                 deactivate IM
-            IS <-- IM : Success or failure
+
+alt invitation token not verified
+            IS <-- IM : False
+        UR <-- IS : null
+    FE <-- UR : HTTP Response: Error
+User <-- FE : Error Message: Invitation not valid
+
+else invitation token verified
+            IS <-- IM : True
             deactivate IM
         UR <-- IS : Invitation object (or null)
         deactivate IS
@@ -127,5 +160,8 @@ User -> FE : Fills out registration form (username, password)
     deactivate UR
 User <-- FE : Redirects to login / Displays error message
 deactivate FE
+
+end
+end
 
 @enduml
