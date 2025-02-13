@@ -27,17 +27,10 @@ This project is currently in development. The repository will evolve as new feat
 
 ## Diagrams
 
-### ERD
-
-![TheMentalLoadHub_ERD.svg](docs/diagrams/erd/TheMentalLoadHub_ERD.png)
-
-### Use Case Diagram (UML)
-
-![use_case.svg](docs/diagrams/uml/use_case/use_case.svg)
-
-### Class Diagram for backend (MVP-Focus) (UML)
-
-![backend.svg](docs/diagrams/uml/class/backend.svg)
+- ERD: [TheMentalLoadHub_ERD.svg](docs/diagrams/erd/TheMentalLoadHub_ERD.png)
+- Use Case Diagram (UML): [use_case.svg](docs/diagrams/uml/use_case/use_case.svg)
+- Class Diagram for backend (MVP-Focus) (UML): [backend.svg](docs/diagrams/uml/class/backend.svg)
+- Sequence Diagram for user registration (UML): [user_registration.svg](docs/diagrams/uml/sequence/user_registration.svg)
 
 ## License
 
