@@ -53,7 +53,7 @@ CREATE TABLE Invitation
     household_id INT NOT NULL ,
     household_role_id INT NOT NULL ,
     email VARCHAR(255) NOT NULL ,
-    hashed_key VARCHAR(255) NOT NULL ,
+    token VARCHAR(255) NOT NULL ,
     is_used BOOLEAN,
     created_at TIMESTAMP DEFAULT current_timestamp,
     PRIMARY KEY (invitation_id),

@@ -41,10 +41,10 @@ package "Models" {
             + updated_at: datetime.datetime {readOnly}
             ' methods --------------------------
             + create(household: Household, email: str, username: str, plain_password: str): User
+            - __hash_password(plain_password): str
             + read_email(): str
             + update_username(new_username: str): None
             + update_email(new_email: str): None
-            - __validate_email(email: str): bool
             + delete(): None
             + reset_password(): None
             + login(password: str): bool
@@ -63,7 +63,7 @@ package "Models" {
     }
 
     '--------------------------------
-    ' AreaOfResponsibility
+    ' Invitation
     '--------------------------------
     Class Invitation {
         ' attributes --------------------------
@@ -71,13 +71,14 @@ package "Models" {
         + household: Household {readOnly}
         + household_role: HouseholdRole {readOnly}
         + email: str {readOnly}
-        - __hashed_key: str
+        - __hashed_token: str
         + is_used: bool
         + created_at: datetime.datetime {readOnly}
         ' methods --------------------------
-        + create(household: Household, household_role: HouseholdRole, email: str, hashed_key: str): Invitation
-        + verify_key(plain_key): bool
-        + use(): None
+        + create(household: Household, household_role: HouseholdRole, email: str, plain_token: str): Invitation
+        - __hash_token(plain_token: str): str
+        + verify_token(plain_token: str): bool
+        + mark_as_used(): None
     }
 
     '--------------------------------
@@ -378,17 +379,23 @@ package Services {
         + read_household(household_id: int): Household
         ' User story #16:
         + update_name(household_id: int, new_name: str): None
-        ' User story #18:
-        + invite_member(household_id: int, email: str, role_id: int): None
     }
 
     Class InvitationService {
         ' User story #18:
-        + create_invitation(household_id: int, email: str, role_id: int): Invitation
+        + invite_member(household_id: int, email: str, role_id: int): None
+        ' User story #18:
+        - __create_invitation(household_id: int, email: str, role_id: int): Invitation
+        ' User story #18:
+        - __generate_unique_token(): str
+        ' User story #18:
+        - __generate_invitation_link(): str
         ' User story #18:
         - __send_invitation_email(email: str, invitation_link: str): None
         ' User story #18, #23:
-        + verify_invitation(plain_key: str, email: str): Invitation
+        + verify_invitation(plain_token: str, email: str): Invitation
+        ' User story #23:
+        + mark_invitation_as_used(invitation_id): None
     }
 
     Class UserService {
