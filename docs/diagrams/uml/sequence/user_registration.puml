@@ -1,0 +1,131 @@
+@startuml
+
+actor Administrator as Admin
+actor "New User" as User
+
+participant "Frontend (React)" as FE
+
+participant "/invitations route\n (Flask Blueprint)" as IR
+participant "/register route\n (Flask Blueprint)" as RR
+participant "/users route\n (Flask Blueprint)" as UR
+
+participant "InvitationService" as IS
+participant "UserService" as US
+
+participant "Invitation Model Object \n (SQLAlchemy\n to Database)" as IM
+participant "User Model Object \n (SQLAlchemy\n to Database)" as UM
+
+participant "Email Service" as Mail
+
+'--- Invitation Process (Admin) ---
+Admin -> FE : Initiates invitation
+    activate FE
+    FE -> IR : HTTP Request: POST /invitations {email, role_id}
+        activate IR
+        IR -> IR : extracts household_id from Administrator User object (sender of invitation)
+        activate IR
+        IR -> IS : invite_member(household_id, email, role_id)
+            deactivate IR
+            activate IS
+            IS -> IS : __generate_unique_token()
+            activate IS
+            deactivate IS
+            IS -> IS : __create_invitation(household_id, email, role_id)
+            activate IS
+            IS -> IM : create(household, household_role, email, plain_token)
+                activate IM
+                IM -> IM : __hash_token(plain_token) (for storage)
+                activate IM
+                deactivate IM
+            IS <-- IM : Invitation object
+            deactivate IM
+            deactivate IS
+            IS -> IS : __generate_invitation_link() [including plain_token]
+            activate IS
+            deactivate IS
+            IS -> IS : __send_invitation_email(email: str, invitation_link: str)
+            activate IS
+            IS -> Mail : calls Mail service to send Email
+                activate Mail
+                User <- Mail : send invitation link to new User
+            IS <-- Mail : Success/Failure
+            deactivate Mail
+            deactivate IS
+        IR <-- IS  : Success/Failure
+        deactivate IS
+    FE <-- IR : HTTP Response: Success/Failure
+    deactivate IR
+Admin <-- FE : Displays success/failure message
+deactivate FE
+
+'--- User Registration Process ---
+User -> FE : Clicks invitation link (/register?token=...&email=...)
+    activate FE
+    FE -> RR : HTTP Request: GET /register?token=<token>&email=<email>
+        activate RR
+        RR -> IS : verify_invitation(plain_token, email)
+            activate IS
+            IS -> IM : query invitation by email, is_used=false, created_after expiration time period before current time
+                activate IM
+            IS <-- IM : Invitation object (or null)
+            deactivate IM
+            IS -> IM : verify_token(plain_token)
+                activate IM
+                IM -> IM : __hash_token(plain_token)
+                activate IM
+                deactivate IM
+            IS <-- IM : Success or failure
+            deactivate IM
+        RR <-- IS : Invitation object (or null)
+        deactivate IS
+    FE <-- RR : HTTP Response: Registration data (email, household_id, role_id) / Error
+    deactivate RR
+User <-- FE : Registration form (username, password) (prefilled and immutable: email, household_id and role_id)
+deactivate FE
+
+User -> FE : Fills out registration form (username, password)
+    activate FE
+    FE -> UR : HTTP Request: POST /users {username, password, email, household_id, role_id, token}
+        activate UR
+        UR -> IS: verify_invitation(plain_token, email) check if token is still valid
+            activate IS
+            IS -> IM : query invitation by email, is_used=false, created_after expiration time period before current time
+                activate IM
+            IS <-- IM : Invitation object (or null)
+            deactivate IM
+            IS -> IM : verify_token(plain_token)
+                activate IM
+                IM -> IM : __hash_token(plain_token)
+                activate IM
+                deactivate IM
+            IS <-- IM : Success or failure
+            deactivate IM
+        UR <-- IS : Invitation object (or null)
+        deactivate IS
+        UR -> US : create_user(invitation, username, plain_password)
+            activate US
+            US -> UM : create(household, email, username, plain_password)
+                activate UM
+                UM -> UM : Hash password
+                activate UM
+                deactivate UM
+            US <-- UM : User object
+            deactivate UM
+        UR <-- US : User object
+        deactivate US
+        UR -> IS : mark_invitation_as_used(invitation_id)
+            activate IS
+            IS -> IM : query invitation by id
+                activate IM
+            IS <-- IM : Invitation object
+            deactivate IM
+            IS -> IM : mark_as_used()
+                activate IM
+            deactivate IM
+        deactivate IS
+    FE <-- UR : HTTP Response: Success/Redirection to login / Error
+    deactivate UR
+User <-- FE : Redirects to login / Displays error message
+deactivate FE
+
+@enduml
