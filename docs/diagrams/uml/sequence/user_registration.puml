@@ -149,7 +149,7 @@ else invitation token verified
             activate US
             US -[#red]> UM : create(household, email, username, plain_password)
                 activate UM
-                UM -[#red]> UM : Hash password
+                UM -[#red]> UM : __hash_password(plain_password)
                 activate UM
                 deactivate UM
             US <-[#blue]- UM : User object
