@@ -2,6 +2,7 @@
 
 skinparam BoxPadding 20
 
+' Actors
 actor Administrator as Admin
 actor "New User" as User
 
@@ -10,13 +11,14 @@ participant "Frontend (React)" as FE
 endbox
 
 box Backend
+' Routes
 participant "/invitations route\n (Flask Blueprint)" as IR
 participant "/register route\n (Flask Blueprint)" as RR
 participant "/users route\n (Flask Blueprint)" as UR
-
+' Services
 participant "InvitationService" as IS
 participant "UserService" as US
-
+' Models
 participant "Invitation Model Object \n (SQLAlchemy\n to Database)" as IM
 participant "User Model Object \n (SQLAlchemy\n to Database)" as UM
 endbox
@@ -26,152 +28,248 @@ participant "Email Service" as Mail
 endbox
 
 == Invitation Process (Admin) ==
-
+' Actors
 Admin -[#red]> FE : Initiates invitation
-    activate FE
-    FE -[#red]> IR : HTTP Request: POST /invitations {email, role_id}
-        activate IR
-        IR -[#red]> IR : extracts household_id from Administrator User object (sender of invitation)
-        activate IR
-        IR -[#red]> IS : invite_member(household_id, email, role_id)
-            deactivate IR
-            activate IS
-            IS -[#red]> IS : __generate_unique_token()
-            activate IS
-            deactivate IS
-            IS -[#red]> IS : __create_invitation(household_id, email, role_id)
-            activate IS
-            IS -[#red]> IM : create(household, household_role, email, plain_token)
-                activate IM
-                IM -[#red]> IM : __hash_token(plain_token) (for storage)
-                activate IM
-                deactivate IM
-            IS <-[#blue]- IM : Invitation object
-            deactivate IM
-            deactivate IS
-            IS -[#red]> IS : __generate_invitation_link() [including plain_token]
-            activate IS
-            deactivate IS
-            IS -[#red]> IS : __send_invitation_email(email: str, invitation_link: str)
-            activate IS
-            IS -[#red]> Mail : calls Mail service to send Email
-                activate Mail
-                deactivate IS
-                deactivate IS
-    FE <-[#blue]- IR : HTTP Response: Success
-    deactivate IR
+
+' Frontend
+activate FE
+FE -[#red]> IR : HTTP Request: POST /invitations {email, role_id}
+
+' Routes
+activate IR
+IR -[#red]> IR : extracts household_id from Administrator User object (sender of invitation)
+activate IR
+IR -[#red]> IS : invite_member(household_id, email, role_id)
+
+' Services
+deactivate IR
+activate IS
+IS -[#red]> IS : __generate_unique_token()
+activate IS
+deactivate IS
+IS -[#red]> IS : __create_invitation(household_id, email, role_id)
+activate IS
+IS -[#red]> IM : create(household, household_role, email, plain_token)
+
+' Models
+activate IM
+IM -[#red]> IM : __hash_token(plain_token) (for storage)
+activate IM
+deactivate IM
+
+' Services
+IS <-[#blue]- IM : Invitation object
+deactivate IM
+deactivate IS
+IS -[#red]> IS : __generate_invitation_link() [including plain_token]
+activate IS
+deactivate IS
+IS -[#red]> IS : __send_invitation_email(email: str, invitation_link: str)
+activate IS
+IS -[#red]> Mail : calls Mail service to send Email
+
+' External Services
+activate Mail
+deactivate IS
+deactivate IS
+
+' Frontend
+FE <-[#blue]- IR : HTTP Response: Success
+deactivate IR
+
+' Actors
 Admin <-[#blue]- FE : Displays success
 deactivate FE
 User <[#red]- Mail : send invitation link to new User
 deactivate Mail
 
 == User Registration Process ==
-
+' Actors
 User -[#red]> FE : Clicks invitation link (/register?token=...&email=...)
-    activate FE
-    FE -[#red]> RR : HTTP Request: GET /register?token=<token>&email=<email>
-        activate RR
-        RR -[#red]> IS : verify_invitation(plain_token, email)
-            activate IS
-            IS -[#red]> IM : query invitation by email, is_used=false, created_after expiration time period before current time
-                activate IM
+
+' Frontend
+activate FE
+FE -[#red]> RR : HTTP Request: GET /register?token=<token>&email=<email>
+
+' Routes
+activate RR
+RR -[#red]> IS : verify_invitation(plain_token, email)
+
+' Services
+activate IS
+IS -[#red]> IM : query invitation by email, is_used=false, created_after expiration time period before current time
+
+' Models
+activate IM
 
 alt invitation does not exist
-            IS <-[#blue]- IM : null
-        RR <-[#blue]- IS : null
+
+    ' Services
+    IS <-[#blue]- IM : null
+
+    ' Routes
+    RR <-[#blue]- IS : null
+
+    ' Frontend
     FE <-[#blue]- RR : HTTP Response: Error
-User <-[#blue]- FE : Error Message: Invitation not valid
+
+    ' Actors
+    User <-[#blue]- FE : Error Message: Invitation not valid
 
 else Invitation does exist
-            IS <-[#blue]- IM : Invitation object
-            deactivate IM
-            IS -[#red]> IM : verify_token(plain_token)
-                activate IM
-                IM -[#red]> IM : __hash_token(plain_token)
-                activate IM
-                deactivate IM
+    ' Services
+    IS <-[#blue]- IM : Invitation object
+    deactivate IM
+    IS -[#red]> IM : verify_token(plain_token)
 
-alt invitation token not verified
-            IS <-[#blue]- IM : False
+    ' Models
+    activate IM
+    IM -[#red]> IM : __hash_token(plain_token)
+    activate IM
+    deactivate IM
+
+    alt invitation token not verified
+        ' Services
+        IS <-[#blue]- IM : False
+
+        ' Routes
         RR <-[#blue]- IS : null
-    FE <-[#blue]- RR : HTTP Response: Error
-User <-[#blue]- FE : Error Message: Invitation not valid
 
-else invitation token verified
-            IS <-[#blue]- IM : True
-            deactivate IM
+        ' Frontend
+        FE <-[#blue]- RR : HTTP Response: Error
+
+        ' Actors
+        User <-[#blue]- FE : Error Message: Invitation not valid
+
+    else invitation token verified
+        ' Services
+        IS <-[#blue]- IM : True
+        deactivate IM
+
+        ' Routes
         RR <-[#blue]- IS : Invitation object
         deactivate IS
-    FE <-[#blue]- RR : HTTP Response: Registration data (email, household_id, role_id) / Error
-    deactivate RR
-User <-[#blue]- FE : Registration form (username, password) (prefilled and immutable: email, household_id and role_id)
-deactivate FE
 
-end
+        ' Frontend
+        FE <-[#blue]- RR : HTTP Response: Registration data (email, household_id, role_id) / Error
+        deactivate RR
+
+        ' Actors
+        User <-[#blue]- FE : Registration form (username, password) (prefilled and immutable: email, household_id and role_id)
+        deactivate FE
+    end
 end
 
+' Actors
 User -[#red]> FE : Fills out registration form (username, password)
-    activate FE
-    FE -[#red]> UR : HTTP Request: POST /users {username, password, email, household_id, role_id, token}
-        activate UR
-        UR -[#red]> IS: verify_invitation(plain_token, email) check if token is still valid
-            activate IS
-            IS -[#red]> IM : query invitation by email, is_used=false, created_after expiration time period before current time
-                activate IM
+
+' Frontend
+activate FE
+FE -[#red]> UR : HTTP Request: POST /users {username, password, email, household_id, role_id, token}
+
+' Routes
+activate UR
+UR -[#red]> IS: verify_invitation(plain_token, email) check if token is still valid
+
+' Services
+activate IS
+IS -[#red]> IM : query invitation by email, is_used=false, created_after expiration time period before current time
+
+' Models
+activate IM
 
 alt invitation does not exist
-            IS <-[#blue]- IM : null
-        UR <-[#blue]- IS : null
+    ' Services
+    IS <-[#blue]- IM : null
+
+    ' Routes
+    UR <-[#blue]- IS : null
+
+    ' Frontend
     FE <-[#blue]- UR : HTTP Response: Error
-User <-[#blue]- FE : Error Message: Invitation not valid
+
+    ' Actors
+    User <-[#blue]- FE : Error Message: Invitation not valid
 
 else Invitation does exist
-            IS <-[#blue]- IM : Invitation object
-            deactivate IM
-            IS -[#red]> IM : verify_token(plain_token)
-                activate IM
-                IM -[#red]> IM : __hash_token(plain_token)
-                activate IM
-                deactivate IM
+    ' Services
+    IS <-[#blue]- IM : Invitation object
+    deactivate IM
+    IS -[#red]> IM : verify_token(plain_token)
 
-alt invitation token not verified
-            IS <-[#blue]- IM : False
+    ' Models
+    activate IM
+    IM -[#red]> IM : __hash_token(plain_token)
+    activate IM
+    deactivate IM
+
+    alt invitation token not verified
+        ' Services
+        IS <-[#blue]- IM : False
+
+        ' Rotues
         UR <-[#blue]- IS : null
-    FE <-[#blue]- UR : HTTP Response: Error
-User <-[#blue]- FE : Error Message: Invitation not valid
 
-else invitation token verified
-            IS <-[#blue]- IM : True
-            deactivate IM
+        ' Frontend
+        FE <-[#blue]- UR : HTTP Response: Error
+
+        ' Actors
+        User <-[#blue]- FE : Error Message: Invitation not valid
+
+    else invitation token verified
+        ' Services
+        IS <-[#blue]- IM : True
+        deactivate IM
+
+        ' Routes
         UR <-[#blue]- IS : Invitation object (or null)
         deactivate IS
         UR -[#red]> US : create_user(invitation, username, plain_password)
-            activate US
-            US -[#red]> UM : create(household, email, username, plain_password)
-                activate UM
-                UM -[#red]> UM : __hash_password(plain_password)
-                activate UM
-                deactivate UM
-            US <-[#blue]- UM : User object
-            deactivate UM
+
+        ' Services
+        activate US
+        US -[#red]> UM : create(household, email, username, plain_password)
+
+        ' Models
+        activate UM
+        UM -[#red]> UM : __hash_password(plain_password)
+        activate UM
+        deactivate UM
+
+        ' Services
+        US <-[#blue]- UM : User object
+        deactivate UM
+
+        ' Routes
         UR <-[#blue]- US : User object
         deactivate US
         UR -[#red]> IS : mark_invitation_as_used(invitation_id)
-            activate IS
-            IS -[#red]> IM : query invitation by id
-                activate IM
-            IS <-[#blue]- IM : Invitation object
-            deactivate IM
-            IS -[#red]> IM : mark_as_used()
-                activate IM
-            deactivate IM
-        deactivate IS
-    FE <-[#blue]- UR : HTTP Response: Success/Redirection to login / Error
-    deactivate UR
-User <[#red]- FE : Redirects to login
-deactivate FE
 
-end
+        ' Services
+        activate IS
+        IS -[#red]> IM : query invitation by id
+
+        ' Models
+        activate IM
+
+        ' Services
+        IS <-[#blue]- IM : Invitation object
+        deactivate IM
+        IS -[#red]> IM : mark_as_used()
+
+        ' Models
+        activate IM
+        deactivate IM
+        deactivate IS
+
+        ' Frontend
+        FE <-[#blue]- UR : HTTP Response: Success/Redirection to login / Error
+        deactivate UR
+
+        ' Actors
+        User <[#red]- FE : Redirects to login
+        deactivate FE
+    end
 end
 
 @enduml
