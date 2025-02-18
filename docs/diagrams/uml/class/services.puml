@@ -1,0 +1,146 @@
+@startuml
+left to right direction
+skinparam {
+    linetype ortho
+    packageStyle rectangle
+}
+
+'--------------------------------
+' Services MVP only
+'--------------------------------
+package Services {
+    Class HouseholdService {
+        + read_household(household_id: int): Household
+        ' User story #16:
+        + update_name(household_id: int, new_name: str): None
+    }
+
+    Class InvitationService {
+        ' User story #18:
+        + invite_member(household_id: int, email: str, role_id: int): None
+        ' User story #18:
+        - __create_invitation(household_id: int, email: str, role_id: int): Invitation
+        ' User story #18:
+        - __generate_unique_token(): str
+        ' User story #18:
+        - __generate_invitation_link(): str
+        ' User story #18:
+        - __send_invitation_email(email: str, invitation_link: str): None
+        ' User story #18, #23:
+        + verify_invitation(plain_token: str, email: str): Invitation
+        ' User story #23:
+        + mark_invitation_as_used(invitation_id): None
+    }
+
+    Class UserService {
+        ' User story #23
+        + create_user(invitation: Invitation, username: str, plain_password: str): User
+        ' User story #27, #34, #36, #37:
+        + read_user(user_id: int): User
+        ' User story #30:
+        + read_users_by_household(household_id: int): List[User]
+        ' User stories #25, #27:
+        + login(username: str, plain_password: str, household_id): bool
+        ' User story #26:
+        + logout(user_id): None
+        ' User stories #25, #27:
+        + authenticate_user(username: str, plain_password: str, household_id: int): User
+        ' User story #28:
+        + reset_user_password(email: str): None
+        ' User story #24:
+        + update_username(household_id: int, new_username: str): None
+        ' User story #27:
+        + update_user_email(household_id: int, new_email: str): None
+        ' User story #24:
+        + update_user_password(user_id: int, current_plain_password: str, new_plain_password: str): None
+        ' User story #20:
+        + update_user_role(user_id: int, new_role_id: int): None
+        + toggle_user_active_status(user_id: int): None
+        ' User story #30:
+        + filter_users_by_role(users: List[User], role_id: int): List[User]
+        ' User story #30:
+        + filter_users_by_active_status(users: List[User], is_active: bool): List[User]
+        ' User story #30:
+        + sort_users_by_name(users: List[User]): List[User]
+        ' User story #30:
+        + sort_users_by_role(users: List[User]): List[User]
+        ' User story #30:
+        + sort_users_by_active_status(users: List[User]): List[User]
+        ' User story #19:
+        + delete_user(user_id: int): None
+    }
+
+    Class TaskService {
+        ' User story #34, #35:
+        + create_task(created_by: User, title: str, is_recurring: bool, description: str): Task
+        + read_task(task_id: int): Task
+        ' User story #42, #43:
+        + read_household_tasks(household_id: int): List[Task]
+        ' User story #46:
+        + read_all_tasks(): List[Task]
+        ' User story #42:
+        + sort_tasks_by_assignee(tasks: List[Task]): List[Task]
+        ' User story #42, #43:
+        + filter_tasks_by_assignee(tasks: List[Task], user_id: int): List[Task]
+        ' User story #44:
+        + sort_tasks_by_due_date(tasks: List[Task]): List[Task]
+        ' User story #44:
+        + filter_tasks_by_due_date(tasks: List[Task], from_due_date: datetime.date): List[Task]
+        ' User story #46:
+        + filter_tasks_by_is_recurring(tasks: List[Task], is_recurring: bool): List[Task]
+        ' User story #36:
+        + read_task_helpers(task_id: int): List[User]
+        ' User story #47:
+        + update_task_priority(task_id: int, new_priority_id): None
+        ' User story #47:
+        + update_task_title(task_id: int, new_title: str): None
+        ' User story #47:
+        + update_task_description(task_id: int, new_description: str): None
+        ' User story #47:
+        + update_task_assignee(task_id: int, new_assignee: User): None
+        ' User story #37:
+        + assign_task_helper(task_id: int, helper: User): None
+        ' User story #37:
+        + delete_task_helper(task_id: int, helper: User): None
+        ' User story #45, #47:
+        + update_task_status(task_id: int, new_status_id: int): None
+        ' User story #49:
+        + delete_task(task_id): None
+    }
+
+    Class RecurringTaskService {
+        ' User story #38:
+        + create_recurring_task(created_by: User, title: str, recurrence_cycle_id: int, recurrence_interval: int, description: str): RecurringTask
+        ' User story #46:
+        + read_tasks_need_to_auto_status_update(tasks: List[Task]): List[Task]
+        ' User story #39, #47:
+        + update_task_recurrence_cycle(task_id: int, new_recurrence_cycle_id: int): None
+        ' User story #39, #47:
+        + update_task_recurrence_interval(task_id: int, new_recurrence_interval: int): None
+        ' User story #40:
+        + toggle_task_active_status(task_id: int): None
+        ' User story #46:
+        + update_recurring_tasks_status(tasks: List[Task]): None
+        ' User story #47:
+        + transform_non_recurring_task_to_recurring_task(task: Task, recurrence_cycle_id: int, recurrence_interval: int): RecurringTask
+    }
+
+    Class NonRecurringTaskService {
+        ' User story #41:
+        + create_non_recurring_task(created_by: User, title: str, deadline: datetime.date, description: str): NonRecurringTask
+        ' User story #41, #47:
+        + update_task_deadline(task_id: int): None
+        ' User story #47:
+        + transform_recurring_task_to_non_recurring_task(deadline: datetime.date): None
+    }
+
+    ' Post MVP:
+    Class AreaOfResponsibilityService {}
+    Class ProjectService {}
+    Class CustomListService {}
+    Class CustomListItemService {}
+    Class ShoppingListService {}
+    Class ShoppingListItemCategoryService {}
+    Class ShoppingListItemService
+}
+@enduml
