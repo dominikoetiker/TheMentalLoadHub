@@ -1,5 +1,5 @@
 @startuml
-'left to right direction
+left to right direction
 skinparam {
     linetype ortho
 }
@@ -8,77 +8,46 @@ skinparam {
 ' Household
 '--------------------------------
 Class Household {
-    ' attributes --------------------------
     + id: int {readOnly}
     + name: str
     + created_at: datetime.datetime {readOnly}
     + updated_at: datetime.datetime {readOnly}
-    ' methods --------------------------
-    + create(name: str): Household
-    + delete(): None
-    + read_members(): List[User]
 }
 
 '--------------------------------
-' User Domain
+' User
 '--------------------------------
 Class User {
-    ' attributes --------------------------
     + id: int {readOnly}
-    + household: Household {readOnly}
-    + household_role: HouseholdRole
-    - __email: str {readOnly}
-    + username: str
+    + email: str {readOnly}
     - __hashed_password: str
     + is_active: bool
     + created_at: datetime.datetime {readOnly}
     + updated_at: datetime.datetime {readOnly}
     ' methods --------------------------
-    + create(household: Household, email: str, username: str, plain_password: str): User
     - __hash_password(plain_password): str
-    + read_email(): str
-    + update_username(new_username: str): None
-    + update_email(new_email: str): None
-    + delete(): None
-    + reset_password(): None
-    + login(password: str): bool
     + update_password(new_plain_password: str): None
     + verify_password(plain_password: str): bool
-    + logout(): None
 }
+
 Class HouseholdRole {
-    ' attributes --------------------------
     + id: int {readOnly}
     + name: str {readOnly}
 }
 
-' Relations inside Domain
-User "0..*" -- "1" HouseholdRole : "assignee"
-
-'--------------------------------
-' Invitation
-'--------------------------------
-Class Invitation {
-    ' attributes --------------------------
-    + id: int {readOnly}
-    + household: Household {readOnly}
-    + household_role: HouseholdRole {readOnly}
-    + email: str {readOnly}
-    - __hashed_token: str
-    + is_used: bool
-    + created_at: datetime.datetime {readOnly}
-    ' methods --------------------------
-    + create(household: Household, household_role: HouseholdRole, email: str, plain_token: str): Invitation
-    - __hash_token(plain_token: str): str
-    + verify_token(plain_token: str): bool
-    + mark_as_used(): None
+Class Household_User {
+    + household_user_id: int {readOnly}
+    + user: User
+    + household: Household
+    + household_role: HouseholdRole
+    + is_accepted: bool
+    + is_deleted: bool
 }
 
 '--------------------------------
 ' AreaOfResponsibility
 '--------------------------------
 Class AreaOfResponsibility {
-    ' attributes --------------------------
     + id: int {readOnly}
     + household: Household {readOnly}
     + assigned_to: User
@@ -86,17 +55,14 @@ Class AreaOfResponsibility {
     + description: str
     + created_at: datetime.datetime {readOnly}
     + updated_at: datetime.datetime {readOnly}
-    ' methods --------------------------
-    + create(household: Household, title: str, description: str): AreaOfResponsibility
-    + delete(): None
 }
 
 '--------------------------------
-' Project Domain
+' Project
 '--------------------------------
 Class Project {
-    ' attributes --------------------------
     + id: int {readOnly}
+    + household: Household {readOnly}
     + created_by: User {readOnly}
     + area_of_responsibility: AreaOfResponsibility
     + title: str
@@ -106,53 +72,33 @@ Class Project {
     + created_at: datetime.datetime {readOnly}
     + updated_at: datetime.datetime {readOnly}
     + done_at: datetime.datetime {readOnly}
-    ' methods --------------------------
-    + create(created_by: User, title: str, description: str): Project
-    + delete(): None
-    + read_goals(): List[Goal]
-    + read_users(): List[User_Project]
-    + read_tasks(): List[Task]
-    + read_custom_lists(): List[CustomList]
-    + read_shopping_lists(): List[ShoppingList]
 }
+
 Class ProjectGoal {
-    ' attributes --------------------------
     + id: int {readOnly}
     + project: Project
     + title: str
     + description: str
-    ' methods --------------------------
-    + create(title: str, description: str): ProjectGoal
-    + delete()
 }
+
 Class ProjectRole {
-    ' attributes --------------------------
     + id: int {readOnly}
     + name: str {readOnly}
 }
+
 Class User_Project {
-    ' attributes --------------------------
     + id: int {readOnly}
     + user: User
     + project: Project
     + role: ProjectRole
-    ' methods --------------------------
-    + create(user: User, project: Project, project_role: ProjectRole): User_Project
-    + delete(): None
 }
 
-' Relations inside Domain
-Project "1" *-- "0..*" ProjectGoal : "has"
-User_Project "0..*" -- "1" Project : "involved in"
-User_Project "0..*" -- "1" ProjectRole : "involved as"
-
-
 '--------------------------------
-' CustomList Domain
+' CustomList
 '--------------------------------
 Class CustomList {
-    ' attributes --------------------------
     + id: int {readOnly}
+    + household: Household {readOnly}
     + created_by: User {readOnly}
     + area_of_responsibility: AreaOfResponsibility
     + project: Project
@@ -162,23 +108,15 @@ Class CustomList {
     + is_active: bool
     + created_at: datetime.datetime {readOnly}
     + updated_at: datetime.datetime {readOnly}
-    ' methods --------------------------
-    + create(created_by: User, title: str, description: str): CustomList
-    + read_items(): List[CustomList_CustomListItem]
-    + delete(): None
-
 }
+
 Class CustomListItem {
-    ' attributes --------------------------
     + id: int {readOnly}
     + household: Household {readOnly}
     + name: str
-    ' methods --------------------------
-    + create(household: Household, name: str): CustomListItem
-    + delete(): None
 }
+
 Class CustomList_CustomListItem {
-    ' attributes --------------------------
     + id: int {readOnly}
     + list: CustomList
     + item: CustomListItem
@@ -187,22 +125,14 @@ Class CustomList_CustomListItem {
     + unit: str
     + note: str
     + is_done: bool
-    ' methods --------------------------
-    + create(list: CustomList, item: CustomListItem, quantity: float, unit: str, parent: CustomListItem): CustomList_CustomListItem
-    + delete(): None
 }
 
-' Relations inside Domain
-CustomList "1" *-- "0..*" CustomList_CustomListItem : "consists of"
-CustomList_CustomListItem "0..*" -- "1" CustomListItem : "has a"
-CustomList_CustomListItem "0..*" -- "0..1" CustomList_CustomListItem : "is child of"
-
 '--------------------------------
-' Task Domain
+' Task
 '--------------------------------
 Class Task {
-    ' attributes --------------------------
     + id: int {readOnly}
+    + household: Household {readOnly}
     + area_of_responsibility: AreaOfResponsibility
     + created_by: User {readOnly}
     + assigned_to: User
@@ -214,51 +144,102 @@ Class Task {
     + created_at: datetime.datetime {readOnly}
     + updated_at: datetime.datetime {readOnly}
     + done_at: datetime.datetime {readOnly}
-    ' methods --------------------------
-    + create(created_by: User, title: str, is_recurring: bool, description: str): Task
-    + delete(): None
 }
+
 Class Priority {
     + id: int {readOnly}
     + name: str {readOnly}
 }
+
 Class Status {
     + id: int {readOnly}
     + name: str {readOnly}
 }
+
 Class Task_TaskHelper {
-    ' attributes --------------------------
     + id: int {readOnly}
     + user: User
     + task: Task
-    ' methods --------------------------
-    + create(user: User, task: Task): Task_TaskHelper
-    + delete(): None
 }
+
 Class RecurrenceCycle {
     + id: int {readOnly}
     + name: str {readOnly}
 }
+
 Class RecurringTask {
-    ' attributes --------------------------
     + recurrence_cycle: RecurrenceCycle
     + recurrence_interval: int
     + next_reset_at: datetime.datetime
     + is_active: bool
-    ' methods --------------------------
-    + create(created_by: User, title: str, description: str): RecurringTask
-    + delete(): None
-}
-Class NonRecurringTask {
-    ' attributes --------------------------
-    + project: Project
-    + deadline: datetime.datetime
-    ' methods --------------------------
-    + create(created_by: User, title: str, description: str): NonRecurringTask
-    + delete(): None
 }
 
-' Relations inside Domain
+Class NonRecurringTask {
+    + project: Project
+    + deadline: datetime.datetime
+}
+
+'--------------------------------
+' ShoppingList
+'--------------------------------
+Class ShoppingList {
+    + id: int {readOnly}
+    + household: Household {readOnly}
+    + created_by: User {readOnly}
+    + project: Project
+    + area_of_responsibility: AreaOfResponsibility
+    + title: str
+    + created_at: datetime.datetime {readOnly}
+    + updated_at: datetime.datetime {readOnly}
+}
+
+Class ShoppingListItemCategory {
+    + id: int {readOnly}
+    + household: Household {readOnly}
+    + name: str
+}
+
+Class ShoppingListItem {
+    + id: int {readOnly}
+    + household: Household {readOnly}
+    + category: ShoppingListItemCategory
+    + title: str
+}
+
+Class ShoppingList_ShoppingListItem {
+    + id: int {readOnly}
+    + list: ShoppingList
+    + item: ShoppingListItem
+    + quantity: float
+    + unit: str
+    + note: str
+    + is_done: bool
+}
+
+'--------------------------------
+' Relations
+'--------------------------------
+User "1" *-- "0..*" Household_User : "belongs to"
+Household_User "0..*" --* "1" Household : "belongs to"
+Household_User "0..*" --* "1" HouseholdRole : "has a"
+
+AreaOfResponsibility "0..*" ---* "1" Household : "belongs to"
+Project "0..*" ---* "1" Household: "belongs to"
+CustomList "0..*" ---* "1" Household: "belongs to"
+CustomListItem "0..*" ---* "1" Household : "belongs to"
+Task "0..*" ---* "1" Household : "belongs to"
+ShoppingList "0..*" ---* "1" Household : "belongs to"
+ShoppingListItem "0..*" ---* "1" Household : "belongs to"
+ShoppingListItemCategory "0..*" ---* "1" Household : "belongs to"
+
+Project "1" *-- "0..*" ProjectGoal : "has"
+User_Project "0..*" -- "1" Project : "involved in"
+User_Project "0..*" -- "1" ProjectRole : "involved as"
+
+CustomList "1" *-- "0..*" CustomList_CustomListItem : "consists of"
+CustomList_CustomListItem "0..*" -- "1" CustomListItem : "has a"
+CustomList_CustomListItem "0..*" -- "0..1" CustomList_CustomListItem : "is child of"
+
 Task "0..*" -- "1" Priority : "has a"
 Task "0..*" -- "1" Status : "has a"
 Task_TaskHelper "0..*" -- "1" Task : "helps"
@@ -269,73 +250,9 @@ RecurringTask  "0..*" - "1" RecurrenceCycle : "has"
 NonRecurringTask "0..1"--|> "1" Task : "is a" <<shared_id>>
 RecurringTask "0..1" --|> "1" Task : "is a" <<shared_id>>
 
-'--------------------------------
-' ShoppingList Domain
-'--------------------------------
-Class ShoppingList {
-    ' attributes --------------------------
-    + id: int {readOnly}
-    + created_by: User {readOnly}
-    + project: Project
-    + area_of_responsibility: AreaOfResponsibility
-    + title: str
-    + created_at: datetime.datetime {readOnly}
-    + updated_at: datetime.datetime {readOnly}
-    ' methods --------------------------
-    + create(created_by: User, title: str): ShoppingList
-    + read_items(): List[ShoppingList_ShoppingListItem]
-    + delete(): None
-}
-Class ShoppingListItemCategory {
-    ' attributes --------------------------
-    + id: int {readOnly}
-    + household: Household {readOnly}
-    + name: str
-    ' methods --------------------------
-    + create(household: Household, name: str): ShoppingListItemCategory
-    + read_items(): List[ShoppingListItem]
-    + delete(): None
-}
-Class ShoppingListItem {
-    ' attributes --------------------------
-    + id: int {readOnly}
-    + household: Household {readOnly}
-    + category: ShoppingListItemCategory
-    + title: str
-    ' methods --------------------------
-    + create(household: Household, title: str, category: ShoppingListItemCategory): ShoppingListItem
-    + delete(): None
-}
-Class ShoppingList_ShoppingListItem {
-    ' attributes --------------------------
-    + id: int {readOnly}
-    + list: ShoppingList
-    + item: ShoppingListItem
-    + quantity: float
-    + unit: str
-    + note: str
-    + is_done: bool
-    ' methods --------------------------
-    + create(list: ShoppingList, item: ShoppingListItem, quantity: float, unit: str): ShoppingList_ShoppingListItem
-    + delete(): None
-}
-
-' Relations inside Domain
 ShoppingList "1" *-- "0..*" ShoppingList_ShoppingListItem : "consists of"
 ShoppingList_ShoppingListItem "0..*" -- "1" ShoppingListItem : "has a"
 ShoppingListItem "0..*" -- "1" ShoppingListItemCategory : "categorized by"
-
-'--------------------------------
-' Relations inside Models Domain (Cross-Sub-Domains)
-'--------------------------------
-User "0..*" ---* "1" Household : "belongs to"
-Invitation "0..*" ---* "1" Household : "belongs to"
-AreaOfResponsibility "0..*" ---* "1" Household : "belongs to"
-CustomListItem "0..*" ---* "1" Household : "belongs to"
-ShoppingListItem "0..*" ---* "1" Household : "belongs to"
-ShoppingListItemCategory "0..*" ---* "1" Household : "belongs to"
-
-Invitation "0..*" -- "1" HouseholdRole : "assigned"
 
 User "1" --- "0..*" Task : "creator"
 User "1" --- "0..*" Task : "assignee"
