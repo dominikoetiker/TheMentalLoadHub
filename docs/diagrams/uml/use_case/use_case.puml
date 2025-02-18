@@ -7,7 +7,6 @@ skinparam usecase {
 }
 
 ' Define primary actors
-actor Root <<System Administrator>>
 actor Administrator <<Household Manager>>
 actor User <<Household Member>>
 
@@ -16,55 +15,41 @@ Administrator -|> User
 ' Mental Load Hub Application
 rectangle "The Mental Load Hub" {
 
-  ' Household Setup (only Root performs these)
-  rectangle "System Setup" {
-    (Create Household) as UC_CreateHousehold
-    (Create Initial Admin Account) as UC_CreateAdminAccount
-    (Send Invitation to Administrator) as UC_SendInvitation
-    (Remove Household) as UC_RemoveHousehold
-
-    Root ----> UC_CreateHousehold
-    Root ----> UC_CreateAdminAccount
-    Root ----> UC_SendInvitation
-    Root ----> UC_RemoveHousehold
-  }
-
   rectangle "Setup" {
 
     ' Account Operations (for all users)
     rectangle "Account Operations" {
-      (Register Account) as UC_Register
+      (Sign up) as UC_SignUp
       (Login) as UC_Login
       (Logout) as UC_Logout
       (Change Credentials) as UC_ChangeCredentials
       (Reset Password) as UC_ResetPassword
-      (Verify Household Membership) as UC_VerifyHousehold
-      (User Authentication) as UC_UserAuthentication
 
-      User ----> UC_Register
+      User ----> UC_SignUp
       User ----> UC_Login
       User ----> UC_ChangeCredentials
       User ----> UC_ResetPassword
       User ----> UC_Logout
-
-      ' Registration includes verifying household membership
-      UC_Register ..> UC_VerifyHousehold: <<include>>
-      UC_Login ..> UC_UserAuthentication : <<include>>
-      UC_ChangeCredentials ..> UC_UserAuthentication : <<include>>
     }
 
     ' Household Administration (Admin-centric)
     rectangle "Household Administration" {
+      (Create Household) as UC_CreateHousehold
       (Change Household Name) as UC_ChangeHouseholdName
       (Invite New Member) as UC_InviteMember
       (Remove Member) as UC_RemoveMember
       (Assign Administrator Role) as UC_AssignAdminRole
       (View Household Members) as UC_ViewHouseholdMembers
+      (Send Invitation to Administrator) as UC_SendInvitation
+      (Remove Household) as UC_RemoveHousehold
 
+      Administrator --> UC_CreateHousehold
       Administrator --> UC_ChangeHouseholdName
       Administrator --> UC_InviteMember
       Administrator --> UC_RemoveMember
       Administrator --> UC_AssignAdminRole
+      Administrator --> UC_SendInvitation
+      Administrator --> UC_RemoveHousehold
       User ----> UC_ViewHouseholdMembers
     }
 
@@ -110,7 +95,6 @@ rectangle "The Mental Load Hub" {
     User ----> UC_DeleteTask
 
     ' Set Status
-    UC_CreateTask ....> UC_SetTaskStatus : <<include>>
     UC_EditTask <.... UC_SetTaskStatus : <<extend>>
 
     ' Kanban Board
