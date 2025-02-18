@@ -1,5 +1,5 @@
 @startuml
-
+left to right direction
 package "Model Classes" {
     '--------------------------------
     ' Household
@@ -215,7 +215,7 @@ package "Model Classes" {
 }
 newpage
 skinparam {
-    linetype ortho
+'    linetype ortho
 }
 
 package "Model Relations" {
@@ -250,8 +250,8 @@ package "Model Relations" {
     RecurringTask  "0..*" - "1" RecurrenceCycle : "has"
 
     ' Inheritance NonRecurring- and Recurring Tasks from Task
-    NonRecurringTask "0..1"--|> "1" Task : "is a" <<shared_id>>
-    RecurringTask "0..1" --|> "1" Task : "is a" <<shared_id>>
+    NonRecurringTask --|> Task : "is a"
+    RecurringTask --|> Task : "is a"
 
     ShoppingList "1" *-- "0..*" ShoppingList_ShoppingListItem : "consists of"
     ShoppingList_ShoppingListItem "0..*" -- "1" ShoppingListItem : "has a"
