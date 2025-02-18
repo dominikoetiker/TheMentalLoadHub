@@ -9,21 +9,16 @@ DROP TABLE IF EXISTS ShoppingList;
 DROP TABLE IF EXISTS Task_TaskHelper;
 DROP TABLE IF EXISTS NonRecurringTask;
 DROP TABLE IF EXISTS RecurringTask;
-DROP TABLE IF EXISTS RecurrenceCycle;
 DROP TABLE IF EXISTS Task;
-DROP TABLE IF EXISTS Status;
-DROP TABLE IF EXISTS Priority;
 DROP TABLE IF EXISTS CustomList_CustomListItem;
 DROP TABLE IF EXISTS CustomListItem;
 DROP TABLE IF EXISTS CustomList;
 DROP TABLE IF EXISTS User_Project;
-DROP TABLE IF EXISTS ProjectRole;
 DROP TABLE IF EXISTS ProjectGoal;
 DROP TABLE IF EXISTS Project;
 DROP TABLE IF EXISTS AreaOfResponsibility;
 DROP TABLE IF EXISTS Household_User;
 DROP TABLE IF EXISTS User;
-DROP TABLE IF EXISTS HouseholdRole;
 DROP TABLE IF EXISTS Household;
 
 
@@ -35,17 +30,6 @@ CREATE TABLE Household
     updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (household_id)
 );
-
-CREATE TABLE HouseholdRole
-(
-    household_role_id   INT AUTO_INCREMENT,
-    household_role_name VARCHAR(255) NOT NULL,
-    PRIMARY KEY (household_role_id)
-);
-
-INSERT INTO HouseholdRole (household_role_name)
-VALUES ('Administrator'),
-       ('User');
 
 CREATE TABLE User
 (
@@ -62,15 +46,14 @@ CREATE TABLE User
 CREATE TABLE Household_User
 (
     household_user_id INT AUTO_INCREMENT,
-    user_id           INT     NOT NULL,
-    household_id      INT     NOT NULL,
-    household_role_id INT     NOT NULL,
-    is_accepted       BOOLEAN NOT NULL DEFAULT FALSE,
-    is_deleted        BOOLEAN NOT NULL DEFAULT FALSE,
+    user_id           INT                            NOT NULL,
+    household_id      INT                            NOT NULL,
+    household_role    ENUM ('administrator', 'user') NOT NULL,
+    is_accepted       BOOLEAN                        NOT NULL DEFAULT FALSE,
+    is_deleted        BOOLEAN                        NOT NULL DEFAULT FALSE,
     PRIMARY KEY (household_user_id),
     FOREIGN KEY (user_id) REFERENCES User (user_id) ON DELETE CASCADE,
     FOREIGN KEY (household_id) REFERENCES Household (household_id) ON DELETE CASCADE,
-    FOREIGN KEY (household_role_id) REFERENCES HouseholdRole (household_role_id),
     UNIQUE (user_id, household_id)
 );
 
@@ -117,27 +100,15 @@ CREATE TABLE ProjectGoal
     FOREIGN KEY (project_id) REFERENCES Project (project_id) ON DELETE CASCADE
 );
 
-CREATE TABLE ProjectRole
-(
-    project_role_id   INT AUTO_INCREMENT,
-    project_role_name VARCHAR(255) NOT NULL,
-    PRIMARY KEY (project_role_id)
-);
-
-INSERT INTO ProjectRole (project_role_name)
-VALUES ('Project Manager'),
-       ('Contributor');
-
 CREATE TABLE User_Project
 (
     user_project_id INT AUTO_INCREMENT,
     user_id         INT NOT NULL,
     project_id      INT NOT NULL,
-    project_role_id INT,
+    project_role    ENUM ('project_manager', 'contributor'),
     PRIMARY KEY (user_project_id),
     FOREIGN KEY (user_id) REFERENCES User (user_id) ON DELETE CASCADE,
-    FOREIGN KEY (project_id) REFERENCES Project (project_id) ON DELETE CASCADE,
-    FOREIGN KEY (project_role_id) REFERENCES ProjectRole (project_role_id) ON DELETE SET NULL
+    FOREIGN KEY (project_id) REFERENCES Project (project_id) ON DELETE CASCADE
 );
 
 CREATE TABLE CustomList
@@ -186,76 +157,35 @@ CREATE TABLE CustomList_CustomListItem
     FOREIGN KEY (parent_item) REFERENCES CustomList_CustomListItem (custom_list_custom_list_item_id) ON DELETE SET NULL
 );
 
-CREATE TABLE Priority
-(
-    priority_id   INT AUTO_INCREMENT,
-    priority_name VARCHAR(255) NOT NULL,
-    PRIMARY KEY (priority_id)
-);
-
-INSERT INTO Priority (priority_name)
-VALUES ('Urgent'),
-       ('High'),
-       ('Medium'),
-       ('Low');
-
-CREATE TABLE Status
-(
-    status_id   INT AUTO_INCREMENT,
-    status_name VARCHAR(255) NOT NULL,
-    PRIMARY KEY (status_id)
-);
-
-INSERT INTO Status (status_name)
-VALUES ('Backlog'),
-       ('To Do'),
-       ('In Progress'),
-       ('Done');
-
 CREATE TABLE Task
 (
     task_id                   INT AUTO_INCREMENT,
     household_id              INT,
-    created_by                INT          NOT NULL,
+    created_by                INT                                              NOT NULL,
     assigned_to               INT,
     area_of_responsibility_id INT,
-    priority_id               INT          NOT NULL,
-    status_id                 INT          NOT NULL,
-    is_recurring              BOOLEAN      NOT NULL DEFAULT FALSE,
-    title                     VARCHAR(255) NOT NULL,
+    priority                  ENUM ('urgent', 'high', 'medium', 'low'),
+    status                    ENUM ('backlog', 'to_do', 'in_progress', 'done') NOT NULL,
+    is_recurring              BOOLEAN                                          NOT NULL DEFAULT FALSE,
+    title                     VARCHAR(255)                                     NOT NULL,
     description               TEXT,
-    created_at                TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
-    updated_at                TIMESTAMP             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at                TIMESTAMP                                                 DEFAULT CURRENT_TIMESTAMP,
+    updated_at                TIMESTAMP                                                 DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     done_at                   DATETIME,
     PRIMARY KEY (task_id),
     FOREIGN KEY (household_id) REFERENCES Household (household_id) ON DELETE CASCADE,
     FOREIGN KEY (created_by) REFERENCES User (user_id) ON DELETE CASCADE,
     FOREIGN KEY (assigned_to) REFERENCES User (user_id) ON DELETE SET NULL,
-    FOREIGN KEY (area_of_responsibility_id) REFERENCES AreaOfResponsibility (area_of_responsibility_id) ON DELETE SET NULL,
-    FOREIGN KEY (priority_id) REFERENCES Priority (priority_id),
-    FOREIGN KEY (status_id) REFERENCES Status (status_id)
+    FOREIGN KEY (area_of_responsibility_id) REFERENCES AreaOfResponsibility (area_of_responsibility_id) ON DELETE SET NULL
 );
-
-CREATE TABLE RecurrenceCycle
-(
-    recurrence_cycle_id   INT AUTO_INCREMENT,
-    recurrence_cycle_name VARCHAR(255) NOT NULL,
-    PRIMARY KEY (recurrence_cycle_id)
-);
-
-INSERT INTO RecurrenceCycle (recurrence_cycle_name)
-VALUES ('daily'),
-       ('weekly'),
-       ('monthly'),
-       ('yearly');
 
 CREATE TABLE RecurringTask
 (
     task_id             INT,
-    recurrence_cycle_id INT      NOT NULL DEFAULT 1,
-    recurrence_interval INT      NOT NULL DEFAULT 1,
-    next_reset_at       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    is_active           BOOLEAN  NOT NULL DEFAULT TRUE,
+    recurrence_cycle    ENUM ('daily', 'weekly','monthly', 'yearly') NOT NULL DEFAULT 1,
+    recurrence_interval INT                                          NOT NULL DEFAULT 1,
+    next_reset_at       DATETIME                                     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    is_active           BOOLEAN                                      NOT NULL DEFAULT TRUE,
     PRIMARY KEY (task_id),
     FOREIGN KEY (task_id) REFERENCES Task (task_id) ON DELETE CASCADE
 );
@@ -358,11 +288,9 @@ CREATE TRIGGER update_task_done_at
     ON Task
     FOR EACH ROW
 BEGIN
-    IF (SELECT s.status_name FROM Status s WHERE s.status_id = NEW.status_id) = 'Done'
-        AND (SELECT s.status_name FROM Status s WHERE s.status_id = OLD.status_id) != 'Done' THEN
+    IF NEW.status = 4 AND OLD.status != 4 THEN
         SET new.done_at = CURRENT_TIMESTAMP;
-    ELSEIF (SELECT s.status_name FROM Status s WHERE s.status_id = NEW.status_id) != 'Done'
-        AND (SELECT s.status_name FROM Status s WHERE s.status_id = OLD.status_id) = 'Done' THEN
+    ELSEIF new.status != 4 AND old.status = 4 THEN
         SET new.done_at = NULL;
     END IF;
 END;

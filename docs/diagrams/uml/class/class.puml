@@ -27,9 +27,9 @@ package "Model Classes" {
         + verify_password(plain_password: str): bool
     }
 
-    Class HouseholdRole {
-        + id: int {readOnly}
-        + name: str {readOnly}
+    Enum HouseholdRole {
+        administrator = 1
+        user = 2
     }
 
     Class Household_User {
@@ -78,9 +78,9 @@ package "Model Classes" {
         + description: str
     }
 
-    Class ProjectRole {
-        + id: int {readOnly}
-        + name: str {readOnly}
+    Enum ProjectRole {
+        project_manager = 1
+        contributor = 2
     }
 
     Class User_Project {
@@ -143,14 +143,18 @@ package "Model Classes" {
         + done_at: datetime.datetime {readOnly}
     }
 
-    Class Priority {
-        + id: int {readOnly}
-        + name: str {readOnly}
+    Enum Priority {
+        urgent = 1
+        high = 2
+        medium = 3
+        low = 4
     }
 
-    Class Status {
-        + id: int {readOnly}
-        + name: str {readOnly}
+    Enum Status {
+        backlog = 1
+        to_do = 2
+        in_progress = 3
+        done = 4
     }
 
     Class Task_TaskHelper {
@@ -159,9 +163,11 @@ package "Model Classes" {
         + task: Task
     }
 
-    Class RecurrenceCycle {
-        + id: int {readOnly}
-        + name: str {readOnly}
+    Enum RecurrenceCycle {
+        daily = 1
+        weekly = 2
+        monthly = 3
+        yearly = 4
     }
 
     Class RecurringTask {
@@ -219,6 +225,11 @@ skinparam {
 }
 
 package "Model Relations" {
+    Enum HouseholdRole
+    Enum ProjectRole
+    Enum Priority
+    Enum Status
+    Enum RecurrenceCycle
     '--------------------------------
     ' Relations
     '--------------------------------
