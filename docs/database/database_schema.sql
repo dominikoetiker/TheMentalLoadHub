@@ -182,7 +182,7 @@ CREATE TABLE Task
 CREATE TABLE RecurringTask
 (
     task_id             INT,
-    recurrence_cycle    ENUM ('daily', 'weekly','monthly', 'yearly') NOT NULL,
+    recurrence_cycle    ENUM ('daily', 'weekly','monthly', 'yearly') NOT NULL DEFAULT 1,
     recurrence_interval INT                                          NOT NULL DEFAULT 1,
     next_reset_at       DATETIME                                     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     is_active           BOOLEAN                                      NOT NULL DEFAULT TRUE,
@@ -290,7 +290,7 @@ CREATE TRIGGER update_task_done_at
 BEGIN
     IF NEW.status = 4 AND OLD.status != 4 THEN
         SET new.done_at = CURRENT_TIMESTAMP;
-    ELSEIF new.status != 4 and old.status = 4 then
+    ELSEIF new.status != 4 AND old.status = 4 THEN
         SET new.done_at = NULL;
     END IF;
 END;
