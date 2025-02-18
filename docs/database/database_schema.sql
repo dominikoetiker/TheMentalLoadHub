@@ -21,8 +21,8 @@ DROP TABLE IF EXISTS ProjectRole;
 DROP TABLE IF EXISTS ProjectGoal;
 DROP TABLE IF EXISTS Project;
 DROP TABLE IF EXISTS AreaOfResponsibility;
+DROP TABLE IF EXISTS Household_User;
 DROP TABLE IF EXISTS User;
-DROP TABLE IF EXISTS Invitation;
 DROP TABLE IF EXISTS HouseholdRole;
 DROP TABLE IF EXISTS Household;
 
@@ -47,36 +47,31 @@ INSERT INTO HouseholdRole (household_role_name)
 VALUES ('Administrator'),
        ('User');
 
-CREATE TABLE Invitation
-(
-    invitation_id INT AUTO_INCREMENT,
-    household_id INT NOT NULL ,
-    household_role_id INT NOT NULL ,
-    email VARCHAR(255) NOT NULL ,
-    token VARCHAR(255) NOT NULL ,
-    is_used BOOLEAN,
-    created_at TIMESTAMP DEFAULT current_timestamp,
-    PRIMARY KEY (invitation_id),
-    FOREIGN KEY (household_id) REFERENCES Household (household_id) ON DELETE CASCADE ,
-    FOREIGN KEY (household_role_id) REFERENCES HouseholdRole (household_role_id),
-    UNIQUE (household_id, email)
-);
-
 CREATE TABLE User
 (
-    user_id           INT AUTO_INCREMENT,
-    household_id      INT          NOT NULL,
-    email             VARCHAR(255) NOT NULL,
-    username          VARCHAR(255) NOT NULL,
-    hashed_password   VARCHAR(255) NOT NULL,
-    household_role_id INT          NOT NULL,
-    is_active         BOOLEAN      NOT NULL DEFAULT TRUE,
-    created_at        TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
-    updated_at        TIMESTAMP             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    user_id         INT AUTO_INCREMENT,
+    email           VARCHAR(255) NOT NULL,
+    hashed_password VARCHAR(255) NOT NULL,
+    is_active       BOOLEAN      NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id),
+    UNIQUE (email)
+);
+
+CREATE TABLE Household_User
+(
+    household_user_id INT AUTO_INCREMENT,
+    user_id           INT     NOT NULL,
+    household_id      INT     NOT NULL,
+    household_role_id INT     NOT NULL,
+    is_accepted       BOOLEAN NOT NULL DEFAULT FALSE,
+    is_deleted        BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY (household_user_id),
+    FOREIGN KEY (user_id) REFERENCES User (user_id) ON DELETE CASCADE,
     FOREIGN KEY (household_id) REFERENCES Household (household_id) ON DELETE CASCADE,
     FOREIGN KEY (household_role_id) REFERENCES HouseholdRole (household_role_id),
-    UNIQUE (household_id, username)
+    UNIQUE (user_id, household_id)
 );
 
 CREATE TABLE AreaOfResponsibility
@@ -96,6 +91,7 @@ CREATE TABLE AreaOfResponsibility
 CREATE TABLE Project
 (
     project_id                INT AUTO_INCREMENT,
+    household_id              INT          NOT NULL,
     created_by                INT          NOT NULL,
     area_of_responsibility_id INT,
     title                     VARCHAR(255) NOT NULL,
@@ -106,6 +102,7 @@ CREATE TABLE Project
     updated_at                TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     done_at                   DATETIME,
     PRIMARY KEY (project_id),
+    FOREIGN KEY (household_id) REFERENCES Household (household_id) ON DELETE CASCADE,
     FOREIGN KEY (created_by) REFERENCES User (user_id) ON DELETE CASCADE,
     FOREIGN KEY (area_of_responsibility_id) REFERENCES AreaOfResponsibility (area_of_responsibility_id) ON DELETE SET NULL
 );
@@ -146,6 +143,7 @@ CREATE TABLE User_Project
 CREATE TABLE CustomList
 (
     custom_list_id            INT AUTO_INCREMENT,
+    household_id              INT,
     created_by                INT          NOT NULL,
     area_of_responsibility_id INT,
     project_id                INT,
@@ -156,6 +154,7 @@ CREATE TABLE CustomList
     created_at                TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at                TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (custom_list_id),
+    FOREIGN KEY (household_id) REFERENCES Household (household_id) ON DELETE CASCADE,
     FOREIGN KEY (created_by) REFERENCES User (user_id) ON DELETE CASCADE,
     FOREIGN KEY (area_of_responsibility_id) REFERENCES AreaOfResponsibility (area_of_responsibility_id) ON DELETE SET NULL,
     FOREIGN KEY (project_id) REFERENCES Project (project_id) ON DELETE CASCADE
@@ -216,6 +215,7 @@ VALUES ('Backlog'),
 CREATE TABLE Task
 (
     task_id                   INT AUTO_INCREMENT,
+    household_id              INT,
     created_by                INT          NOT NULL,
     assigned_to               INT,
     area_of_responsibility_id INT,
@@ -228,6 +228,7 @@ CREATE TABLE Task
     updated_at                TIMESTAMP             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     done_at                   DATETIME,
     PRIMARY KEY (task_id),
+    FOREIGN KEY (household_id) REFERENCES Household (household_id) ON DELETE CASCADE,
     FOREIGN KEY (created_by) REFERENCES User (user_id) ON DELETE CASCADE,
     FOREIGN KEY (assigned_to) REFERENCES User (user_id) ON DELETE SET NULL,
     FOREIGN KEY (area_of_responsibility_id) REFERENCES AreaOfResponsibility (area_of_responsibility_id) ON DELETE SET NULL,
@@ -282,6 +283,7 @@ CREATE TABLE Task_TaskHelper
 CREATE TABLE ShoppingList
 (
     shopping_list_id          INT AUTO_INCREMENT,
+    household_id              INT,
     created_by                INT          NOT NULL,
     area_of_responsibility_id INT,
     project_id                INT,
@@ -289,6 +291,7 @@ CREATE TABLE ShoppingList
     created_at                TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at                TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (shopping_list_id),
+    FOREIGN KEY (household_id) REFERENCES Household (household_id) ON DELETE CASCADE,
     FOREIGN KEY (created_by) REFERENCES User (user_id) ON DELETE CASCADE,
     FOREIGN KEY (area_of_responsibility_id) REFERENCES AreaOfResponsibility (area_of_responsibility_id) ON DELETE SET NULL,
     FOREIGN KEY (project_id) REFERENCES Project (project_id) ON DELETE CASCADE
