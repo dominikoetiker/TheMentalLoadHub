@@ -1,275 +1,129 @@
 @startuml
-
-skinparam BoxPadding 20
-
-' Actors
-actor Administrator as Admin
-actor "New User" as User
-
-box Frontend
+actor "New User" as AppUser
 participant "Frontend (React)" as FE
-endbox
-
-box Backend
-' Routes
-participant "/invitations route\n (Flask Blueprint)" as IR
-participant "/register route\n (Flask Blueprint)" as RR
-participant "/users route\n (Flask Blueprint)" as UR
-' Services
-participant "InvitationService" as IS
+participant "/signup route\n (Flask Blueprint)" as SR
+participant "/verify route\n (Flask Blueprint)" as VR
 participant "UserService" as US
-' Models
-participant "Invitation Model Object \n (SQLAlchemy\n to Database)" as IM
 participant "User Model Object \n (SQLAlchemy\n to Database)" as UM
-endbox
-
-box External Service
 participant "Email Service" as Mail
-endbox
 
-== Invitation Process (Admin) ==
-' Actors
-Admin -[#red]> FE : Initiates invitation
-
-' Frontend
+== Sign up Process ==
+AppUser -> FE : Navigates to sign up form
 activate FE
-FE -[#red]> IR : HTTP Request: POST /invitations {email, role_id}
-
-' Routes
-activate IR
-IR -[#red]> IR : extracts household_id from Administrator User object (sender of invitation)
-activate IR
-IR -[#red]> IS : invite_member(household_id, email, role_id)
-
-' Services
-deactivate IR
-activate IS
-IS -[#red]> IS : __generate_unique_token()
-activate IS
-deactivate IS
-IS -[#red]> IS : __create_invitation(household_id, email, role_id)
-activate IS
-IS -[#red]> IM : create(household, household_role, email, plain_token)
-
-' Models
-activate IM
-IM -[#red]> IM : __hash_token(plain_token) (for storage)
-activate IM
-deactivate IM
-
-' Services
-IS <-[#blue]- IM : Invitation object
-deactivate IM
-deactivate IS
-IS -[#red]> IS : __generate_invitation_link() [including plain_token]
-activate IS
-deactivate IS
-IS -[#red]> IS : __send_invitation_email(email: str, invitation_link: str)
-activate IS
-IS -[#red]> Mail : calls Mail service to send Email
-
-' External Services
-activate Mail
-deactivate IS
-deactivate IS
-
-' Frontend
-FE <-[#blue]- IR : HTTP Response: Success
-deactivate IR
-
-' Actors
-Admin <-[#blue]- FE : Displays success
+AppUser <-- FE : Sign up form
+AppUser -> FE : Fills sign up form {email, plain_password} and submits
+FE -> SR : HTTP Request: POST {email, plain_password}
 deactivate FE
-User <[#red]- Mail : send invitation link to new User
+activate SR
+SR -> US : is_email_format_valid(email)
+activate US
+alt Email format not valid
+    SR <-- US : False
+    FE <-- SR : HTTP Response: 400 Bad Request (Email format not valid)
+    activate FE
+    AppUser <-- FE : Error: Email format not valid, try again
+    deactivate FE
+end
+SR <-- US : True
+deactivate US
+SR -> US : query_users_by_mail(email)
+activate US
+alt Account already exists
+    SR <-- US : User (object)
+    FE <-- SR : HTTP Response: 409 Conflict (User exists)
+    activate FE
+    AppUser <-- FE : Error: account already exists, redirects to login page
+    deactivate FE
+end
+SR <-- US : None
+deactivate US
+SR -> US : create_user(email, plain_password)
+activate US
+US -> US : __create_verification_token()
+activate US
+deactivate US
+US -> UM : new(unverified_email, plain_password, plain_verification_token)
+activate UM
+UM -> UM : __hash_secret(password)
+activate UM
+deactivate UM
+UM -> UM : __hash_secret(plain_verification_token)
+activate UM
+deactivate UM
+UM -> UM : verification_exp_at = (now + 48h)
+activate UM
+deactivate UM
+US <-- UM : User (object)
+deactivate UM
+US -> US : __create_verification_link(plain_verification_token, unverified_email)
+activate US
+deactivate US
+US -> US : __send_verification_mail(verification_link)
+activate US
+US -> Mail : send email {verification_link, email}
+activate Mail
+deactivate US
+SR <-- US : User (object)
+deactivate US
+FE <-- SR : HTTP Response: 201 Created (User created)
+deactivate SR
+activate FE
+AppUser <-- FE : Success Message and "check your mail"
+deactivate FE
+AppUser <- Mail : Mail with link
 deactivate Mail
 
-== User Registration Process ==
-' Actors
-User -[#red]> FE : Clicks invitation link (/register?token=...&email=...)
-
-' Frontend
+== E-Mail Verification ==
+AppUser -> FE : clicks link (send email and token)
 activate FE
-FE -[#red]> RR : HTTP Request: GET /register?token=<token>&email=<email>
-
-' Routes
-activate RR
-RR -[#red]> IS : verify_invitation(plain_token, email)
-
-' Services
-activate IS
-IS -[#red]> IM : query invitation by email, is_used=false, created_after expiration time period before current time
-
-' Models
-activate IM
-
-alt invitation does not exist
-
-    ' Services
-    IS <-[#blue]- IM : null
-
-    ' Routes
-    RR <-[#blue]- IS : null
-
-    ' Frontend
-    FE <-[#blue]- RR : HTTP Response: Error
-
-    ' Actors
-    User <-[#blue]- FE : Error Message: Invitation not valid
-
-else Invitation does exist
-    ' Services
-    IS <-[#blue]- IM : Invitation object
-    deactivate IM
-    IS -[#red]> IM : verify_token(plain_token)
-
-    ' Models
-    activate IM
-    IM -[#red]> IM : __hash_token(plain_token)
-    activate IM
-    deactivate IM
-
-    alt invitation token not verified
-        ' Services
-        IS <-[#blue]- IM : False
-
-        ' Routes
-        RR <-[#blue]- IS : null
-
-        ' Frontend
-        FE <-[#blue]- RR : HTTP Response: Error
-
-        ' Actors
-        User <-[#blue]- FE : Error Message: Invitation not valid
-
-    else invitation token verified
-        ' Services
-        IS <-[#blue]- IM : True
-        deactivate IM
-
-        ' Routes
-        RR <-[#blue]- IS : Invitation object
-        deactivate IS
-
-        ' Frontend
-        FE <-[#blue]- RR : HTTP Response: Registration data (email, household_id, role_id) / Error
-        deactivate RR
-
-        ' Actors
-        User <-[#blue]- FE : Registration form (username, password) (prefilled and immutable: email, household_id and role_id)
-        deactivate FE
-    end
+FE -> VR : HTTP Request: GET {email, plain_verification_token}
+deactivate FE
+activate VR
+VR -> US : is_email_format_valid(email)
+activate US
+alt Email format not valid
+    VR <-- US : False
+    FE <-- VR : HTTP Response: 404 Not Found
+    activate FE
+    AppUser <-- FE : Error: link not valid
+    deactivate FE
 end
-
-' Actors
-User -[#red]> FE : Fills out registration form (username, password)
-
-' Frontend
-activate FE
-FE -[#red]> UR : HTTP Request: POST /users {username, password, email, household_id, role_id, token}
-
-' Routes
-activate UR
-UR -[#red]> IS: verify_invitation(plain_token, email) check if token is still valid
-
-' Services
-activate IS
-IS -[#red]> IM : query invitation by email, is_used=false, created_after expiration time period before current time
-
-' Models
-activate IM
-
-alt invitation does not exist
-    ' Services
-    IS <-[#blue]- IM : null
-
-    ' Routes
-    UR <-[#blue]- IS : null
-
-    ' Frontend
-    FE <-[#blue]- UR : HTTP Response: Error
-
-    ' Actors
-    User <-[#blue]- FE : Error Message: Invitation not valid
-
-else Invitation does exist
-    ' Services
-    IS <-[#blue]- IM : Invitation object
-    deactivate IM
-    IS -[#red]> IM : verify_token(plain_token)
-
-    ' Models
-    activate IM
-    IM -[#red]> IM : __hash_token(plain_token)
-    activate IM
-    deactivate IM
-
-    alt invitation token not verified
-        ' Services
-        IS <-[#blue]- IM : False
-
-        ' Rotues
-        UR <-[#blue]- IS : null
-
-        ' Frontend
-        FE <-[#blue]- UR : HTTP Response: Error
-
-        ' Actors
-        User <-[#blue]- FE : Error Message: Invitation not valid
-
-    else invitation token verified
-        ' Services
-        IS <-[#blue]- IM : True
-        deactivate IM
-
-        ' Routes
-        UR <-[#blue]- IS : Invitation object (or null)
-        deactivate IS
-        UR -[#red]> US : create_user(invitation, username, plain_password)
-
-        ' Services
-        activate US
-        US -[#red]> UM : create(household, email, username, plain_password)
-
-        ' Models
-        activate UM
-        UM -[#red]> UM : __hash_password(plain_password)
-        activate UM
-        deactivate UM
-
-        ' Services
-        US <-[#blue]- UM : User object
-        deactivate UM
-
-        ' Routes
-        UR <-[#blue]- US : User object
-        deactivate US
-        UR -[#red]> IS : mark_invitation_as_used(invitation_id)
-
-        ' Services
-        activate IS
-        IS -[#red]> IM : query invitation by id
-
-        ' Models
-        activate IM
-
-        ' Services
-        IS <-[#blue]- IM : Invitation object
-        deactivate IM
-        IS -[#red]> IM : mark_as_used()
-
-        ' Models
-        activate IM
-        deactivate IM
-        deactivate IS
-
-        ' Frontend
-        FE <-[#blue]- UR : HTTP Response: Success/Redirection to login / Error
-        deactivate UR
-
-        ' Actors
-        User <[#red]- FE : Redirects to login
-        deactivate FE
-    end
+VR <-- US : True
+deactivate US
+VR -> US : query_users_by_unverified_mail_and_not_expired_verification(unverified_email: str)
+activate US
+alt Unverified Mail does not exist or expired
+    VR <-- US : None
+    FE <-- VR : HTTP Response: 404 Not Found
+    activate FE
+    AppUser <-- FE : Error: link not valid
+    deactivate FE
 end
-
+VR <-- US : User object
+deactivate US
+VR -> US : verify_email(User, plain_verification_token)
+activate US
+US -> UM : verify_verification_token(plain_verification_token)
+activate UM
+UM -> UM : __hash_secret(plain_verification_token)
+activate UM
+deactivate UM
+alt verification token does not match
+    US <-- UM : False
+    VR <-- US : False
+    FE <-- VR : HTTP Response: 404 Not Found
+    activate FE
+    AppUser <-- FE : Error: link not valid
+    deactivate FE
+end
+US <-- UM : True
+US -> UM : is_user_verified = True
+US -> UM : email = unverified_email
+US -> UM : unverified_email = ""
+deactivate UM
+VR <-- US : True
+deactivate US
+FE <-- VR : HTTP Response: 200 OK (Email verified)
+deactivate VR
+AppUser <-- FE : Success Message and redirects to login page
 @enduml

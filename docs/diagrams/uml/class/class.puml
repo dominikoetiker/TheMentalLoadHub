@@ -301,9 +301,14 @@ package "Services Classes" {
     ' Services MVP only
     '--------------------------------
     Class UserService {
-        + create_user(email: str, plain_password: str): User
         + query_users_by_mail(email: str): User
+        + query_users_by_unverified_mail_and_not_expired_verification(unverified_email: str): User
         + is_email_format_valid(email: str): bool
+        + create_user(email: str, plain_password: str): User
+        - __create_verification_token(): str
+        - __create_verification_link(plain_verification_token: str, email: str): str
+        - __send_verification_mail(verification_link: str): None
+        + verify_email(user: User, verification_token: str): bool
     }
 
     Class HouseholdService {
