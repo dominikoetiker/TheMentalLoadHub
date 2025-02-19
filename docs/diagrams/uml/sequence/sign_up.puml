@@ -73,6 +73,7 @@ deactivate FE
 AppUser <- Mail : Mail with link
 deactivate Mail
 
+newpage
 == E-Mail Verification ==
 AppUser -> FE : clicks link (send email and token)
 activate FE

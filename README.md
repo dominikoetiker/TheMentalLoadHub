@@ -1,12 +1,16 @@
 # The Mental Load Hub
 
-**The Mental Load Hub** is a household organization application designed to simplify daily life for any shared living arrangement. The app provides a centralized platform for managing tasks, projects, shopping lists, and custom lists, enabling household members to collaborate efficiently and reduce organizational overhead.
+**The Mental Load Hub** is a household organization application designed to simplify daily life for any shared living
+arrangement. The app provides a centralized platform for managing tasks, projects, shopping lists, and custom lists,
+enabling household members to collaborate efficiently and reduce organizational overhead.
 
 ## About the Project
 
-For details on project planning and the current status, see: [The Mental Load Hub - GitHub Projects](https://github.com/users/dominikoetiker/projects/1)
+For details on project planning and the current status,
+see: [The Mental Load Hub - GitHub Projects](https://github.com/users/dominikoetiker/projects/1)
 
 The goal of The Mental Load Hub is to streamline household management by offering features that help users:
+
 - Organize and assign daily tasks with priorities and deadlines.
 - Manage recurring chores and one-time tasks through visual status tracking and Kanban boards.
 - Create and maintain shopping lists with real-time synchronization.
@@ -16,7 +20,8 @@ The goal of The Mental Load Hub is to streamline household management by offerin
 - Stay informed with customizable reminders and notifications.
 - Adapt the interface to multiple languages and regional settings.
 
-This project is currently in development. The repository will evolve as new features are implemented and the overall design is refined based on feedback and testing.
+This project is currently in development. The repository will evolve as new features are implemented and the overall
+design is refined based on feedback and testing.
 
 ## Planned Tech Stack
 
@@ -30,10 +35,12 @@ This project is currently in development. The repository will evolve as new feat
 - ERD: [TheMentalLoadHub_ERD.svg](docs/diagrams/erd/TheMentalLoadHub_ERD.png)
 - Use Case Diagram (UML): [use_case.svg](docs/diagrams/uml/use_case/use_case.svg)
 - Class Diagram for backend (MVP-Focus) (UML)
-  - Model Classes: [class-0.svg](docs/diagrams/uml/class/class-0.svg)
-  - Model Relations: [class-1.svg](docs/diagrams/uml/class/class-1.svg)
-  - Service Classes: [class-2.svg](docs/diagrams/uml/class/class-2.svg)
-- Sequence Diagram for user registration (UML): [user_registration.svg](docs/diagrams/uml/sequence/user_registration.svg)
+    - Model Classes: [class-0.svg](docs/diagrams/uml/class/class-0.svg)
+    - Model Relations: [class-1.svg](docs/diagrams/uml/class/class-1.svg)
+    - Service Classes: [class-2.svg](docs/diagrams/uml/class/class-2.svg)
+- Sequence Diagram
+    - Sign up I  (UML): [user_registration.svg](docs/diagrams/uml/sequence/sign_up-0.svg)
+    - Sign up II (UML): [user_registration.svg](docs/diagrams/uml/sequence/sign_up-1.svg)
 
 ## License
 
