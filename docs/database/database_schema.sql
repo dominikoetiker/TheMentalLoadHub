@@ -33,12 +33,16 @@ CREATE TABLE Household
 
 CREATE TABLE User
 (
-    user_id         INT AUTO_INCREMENT,
-    email           VARCHAR(255) NOT NULL,
-    hashed_password VARCHAR(255) NOT NULL,
-    is_active       BOOLEAN      NOT NULL DEFAULT TRUE,
-    created_at      TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMP             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    user_id                   INT AUTO_INCREMENT,
+    email                     VARCHAR(255),
+    hashed_password           VARCHAR(255) NOT NULL,
+    unverified_email          VARCHAR(255),
+    hashed_verification_token VARCHAR(255) NOT NULL,
+    is_user_verified          BOOLEAN      NOT NULL DEFAULT FALSE,
+    verification_exp_at       DATETIME     NOT NULL,
+    is_active                 BOOLEAN      NOT NULL DEFAULT TRUE,
+    created_at                TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
+    updated_at                TIMESTAMP             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id),
     UNIQUE (email)
 );
