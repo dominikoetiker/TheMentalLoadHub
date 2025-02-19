@@ -40,7 +40,6 @@ CREATE TABLE User
     hashed_verification_token VARCHAR(255) NOT NULL,
     is_user_verified          BOOLEAN      NOT NULL DEFAULT FALSE,
     verification_exp_at       DATETIME     NOT NULL,
-    is_active                 BOOLEAN      NOT NULL DEFAULT TRUE,
     created_at                TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
     updated_at                TIMESTAMP             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id),
