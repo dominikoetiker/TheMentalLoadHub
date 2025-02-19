@@ -266,9 +266,6 @@ package "Model Classes" {
     }
 }
 newpage
-skinparam {
-'    linetype ortho
-}
 
 package "Model Relations" {
     Enum HouseholdRole
