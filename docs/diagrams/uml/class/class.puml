@@ -7,10 +7,10 @@ package "Model Classes" {
     ' Household
     '--------------------------------
     Class Household {
-        + id: int {readOnly}
+        + id: int
         + name: str
-        + created_at: datetime.datetime {readOnly}
-        + updated_at: datetime.datetime {readOnly}
+        + created_at: datetime.datetime
+        + updated_at: datetime.datetime
         + is_deleted: bool
     }
 
@@ -18,15 +18,15 @@ package "Model Classes" {
     ' User
     '--------------------------------
     Class User {
-        + id: int {readOnly}
+        + id: int
         + email: str
         - __hashed_password: str
         + unverified_email: str
         - __hashed_verification_token: str
         + is_user_verified: bool
         + verification_exp_at: datetime.datetime
-        + created_at: datetime.datetime {readOnly}
-        + updated_at: datetime.datetime {readOnly}
+        + created_at: datetime.datetime
+        + updated_at: datetime.datetime
         + is_deleted: bool
         ' methods --------------------------
         - __hash_secret(secret: str): str
@@ -42,13 +42,13 @@ package "Model Classes" {
     }
 
     Class Household_User {
-        + household_user_id: int {readOnly}
+        + household_user_id: int
         + user: User
         + household: Household
         + household_role: HouseholdRole
         + is_accepted: bool
-        + created_at: datetime.datetime {readOnly}
-        + updated_at: datetime.datetime {readOnly}
+        + created_at: datetime.datetime
+        + updated_at: datetime.datetime
         + is_deleted: bool
     }
 
@@ -56,13 +56,13 @@ package "Model Classes" {
     ' AreaOfResponsibility
     '--------------------------------
     Class AreaOfResponsibility {
-        + id: int {readOnly}
-        + household: Household {readOnly}
+        + id: int
+        + household: Household
         + assigned_to: User
         + title: str
         + description: str
-        + created_at: datetime.datetime {readOnly}
-        + updated_at: datetime.datetime {readOnly}
+        + created_at: datetime.datetime
+        + updated_at: datetime.datetime
         + is_deleted: bool
     }
 
@@ -70,27 +70,27 @@ package "Model Classes" {
     ' Project
     '--------------------------------
     Class Project {
-        + id: int {readOnly}
-        + household: Household {readOnly}
-        + created_by: User {readOnly}
+        + id: int
+        + household: Household
+        + created_by: User
         + area_of_responsibility: AreaOfResponsibility
         + title: str
         + description: str
         + deadline: datetime.date
         + is_done: bool
-        + done_at: datetime.datetime {readOnly}
-        + created_at: datetime.datetime {readOnly}
-        + updated_at: datetime.datetime {readOnly}
+        + done_at: datetime.datetime
+        + created_at: datetime.datetime
+        + updated_at: datetime.datetime
         + is_deleted: bool
     }
 
     Class ProjectGoal {
-        + id: int {readOnly}
+        + id: int
         + project: Project
         + title: str
         + description: str
-        + created_at: datetime.datetime {readOnly}
-        + updated_at: datetime.datetime {readOnly}
+        + created_at: datetime.datetime
+        + updated_at: datetime.datetime
         + is_deleted: bool
     }
 
@@ -100,12 +100,12 @@ package "Model Classes" {
     }
 
     Class User_Project {
-        + id: int {readOnly}
+        + id: int
         + user: User
         + project: Project
         + role: ProjectRole
-        + created_at: datetime.datetime {readOnly}
-        + updated_at: datetime.datetime {readOnly}
+        + created_at: datetime.datetime
+        + updated_at: datetime.datetime
         + is_deleted: bool
     }
 
@@ -113,31 +113,31 @@ package "Model Classes" {
     ' CustomList
     '--------------------------------
     Class CustomList {
-        + id: int {readOnly}
-        + household: Household {readOnly}
-        + created_by: User {readOnly}
+        + id: int
+        + household: Household
+        + created_by: User
         + area_of_responsibility: AreaOfResponsibility
         + project: Project
         + title: str
         + description: str
         + is_checklist: bool
         + is_active: bool
-        + created_at: datetime.datetime {readOnly}
-        + updated_at: datetime.datetime {readOnly}
+        + created_at: datetime.datetime
+        + updated_at: datetime.datetime
         + is_deleted: bool
     }
 
     Class CustomListItem {
-        + id: int {readOnly}
-        + household: Household {readOnly}
+        + id: int
+        + household: Household
         + name: str
-        + created_at: datetime.datetime {readOnly}
-        + updated_at: datetime.datetime {readOnly}
+        + created_at: datetime.datetime
+        + updated_at: datetime.datetime
         + is_deleted: bool
     }
 
     Class CustomList_CustomListItem {
-        + id: int {readOnly}
+        + id: int
         + list: CustomList
         + item: CustomListItem
         + parent: CustomList_CustomListItem
@@ -145,8 +145,8 @@ package "Model Classes" {
         + unit: str
         + note: str
         + is_done: bool
-        + created_at: datetime.datetime {readOnly}
-        + updated_at: datetime.datetime {readOnly}
+        + created_at: datetime.datetime
+        + updated_at: datetime.datetime
         + is_deleted: bool
     }
 
@@ -154,19 +154,19 @@ package "Model Classes" {
     ' Task
     '--------------------------------
     Class Task {
-        + id: int {readOnly}
-        + household: Household {readOnly}
+        + id: int
+        + household: Household
         + area_of_responsibility: AreaOfResponsibility
-        + created_by: User {readOnly}
+        + created_by: User
         + assigned_to: User
         + priority: Priority
         + status: Status
         + is_recurring: bool
         + title: str
         + description: str
-        + done_at: datetime.datetime {readOnly}
-        + created_at: datetime.datetime {readOnly}
-        + updated_at: datetime.datetime {readOnly}
+        + done_at: datetime.datetime
+        + created_at: datetime.datetime
+        + updated_at: datetime.datetime
         + is_deleted: bool
     }
 
@@ -185,11 +185,11 @@ package "Model Classes" {
     }
 
     Class Task_TaskHelper {
-        + id: int {readOnly}
+        + id: int
         + user: User
         + task: Task
-        + created_at: datetime.datetime {readOnly}
-        + updated_at: datetime.datetime {readOnly}
+        + created_at: datetime.datetime
+        + updated_at: datetime.datetime
         + is_deleted: bool
     }
 
@@ -205,16 +205,16 @@ package "Model Classes" {
         + recurrence_interval: int
         + next_reset_at: datetime.datetime
         + is_active: bool
-        + created_at: datetime.datetime {readOnly}
-        + updated_at: datetime.datetime {readOnly}
+        + created_at: datetime.datetime
+        + updated_at: datetime.datetime
         + is_deleted: bool
     }
 
     Class NonRecurringTask {
         + project: Project
         + deadline: datetime.datetime
-        + created_at: datetime.datetime {readOnly}
-        + updated_at: datetime.datetime {readOnly}
+        + created_at: datetime.datetime
+        + updated_at: datetime.datetime
         + is_deleted: bool
     }
 
@@ -222,46 +222,46 @@ package "Model Classes" {
     ' ShoppingList
     '--------------------------------
     Class ShoppingList {
-        + id: int {readOnly}
-        + household: Household {readOnly}
-        + created_by: User {readOnly}
+        + id: int
+        + household: Household
+        + created_by: User
         + project: Project
         + area_of_responsibility: AreaOfResponsibility
         + title: str
-        + created_at: datetime.datetime {readOnly}
-        + updated_at: datetime.datetime {readOnly}
+        + created_at: datetime.datetime
+        + updated_at: datetime.datetime
         + is_deleted: bool
     }
 
     Class ShoppingListItemCategory {
-        + id: int {readOnly}
-        + household: Household {readOnly}
+        + id: int
+        + household: Household
         + name: str
-        + created_at: datetime.datetime {readOnly}
-        + updated_at: datetime.datetime {readOnly}
+        + created_at: datetime.datetime
+        + updated_at: datetime.datetime
         + is_deleted: bool
     }
 
     Class ShoppingListItem {
-        + id: int {readOnly}
-        + household: Household {readOnly}
+        + id: int
+        + household: Household
         + category: ShoppingListItemCategory
         + title: str
-        + created_at: datetime.datetime {readOnly}
-        + updated_at: datetime.datetime {readOnly}
+        + created_at: datetime.datetime
+        + updated_at: datetime.datetime
         + is_deleted: bool
     }
 
     Class ShoppingList_ShoppingListItem {
-        + id: int {readOnly}
+        + id: int
         + list: ShoppingList
         + item: ShoppingListItem
         + quantity: float
         + unit: str
         + note: str
         + is_done: bool
-        + created_at: datetime.datetime {readOnly}
-        + updated_at: datetime.datetime {readOnly}
+        + created_at: datetime.datetime
+        + updated_at: datetime.datetime
         + is_deleted: bool
     }
 }
