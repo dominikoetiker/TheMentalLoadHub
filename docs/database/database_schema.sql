@@ -205,7 +205,7 @@ CREATE TABLE Task
 CREATE TABLE RecurringTask
 (
     task_id             INT,
-    recurrence_cycle    ENUM ('daily', 'weekly','monthly', 'yearly') NOT NULL,
+    recurrence_cycle    ENUM ('daily', 'weekly','monthly', 'yearly') NOT NULL DEFAULT 'daily',
     recurrence_interval INT                                          NOT NULL DEFAULT 1,
     next_reset_at       DATETIME                                     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     is_active           BOOLEAN                                      NOT NULL DEFAULT TRUE,
