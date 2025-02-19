@@ -1,4 +1,6 @@
 @startuml
+' US = User Story
+
 left to right direction
 package "Model Classes" {
     '--------------------------------
@@ -16,15 +18,20 @@ package "Model Classes" {
     '--------------------------------
     Class User {
         + id: int {readOnly}
-        + email: str {readOnly}
+        + email: str
         - __hashed_password: str
-        + is_active: bool
+        + unverified_email: str
+        - __hashed_verification_token: str
+        + is_user_verified: bool
+        + verification_exp_at: datetime.datetime
         + created_at: datetime.datetime {readOnly}
         + updated_at: datetime.datetime {readOnly}
         ' methods --------------------------
-        - __hash_password(plain_password): str
+        - __hash_secret(secret: str): str
         + update_password(new_plain_password: str): None
         + verify_password(plain_password: str): bool
+        + update_verification_token(plain_verification_token: str): None
+        + verify_verification_token(plain_verification_token: str): bool
     }
 
     Enum HouseholdRole {
@@ -294,11 +301,16 @@ package "Services Classes" {
     ' Services MVP only
     '--------------------------------
     Class UserService {
+        + create_user(email: str, plain_password: str): User
+        + query_users_by_mail(email: str): User
+        + is_email_format_valid(email: str): bool
     }
 
     Class HouseholdService {
         ' US #12 #13
         + create_household(name: str, creator: User): Household
+        ' US #15
+        + query_household_list_by_household_admin(household_admin: User): List[Household]
         ' US #13
         + assign_household_role(user: User, role: HouseholdRole): None
     }
