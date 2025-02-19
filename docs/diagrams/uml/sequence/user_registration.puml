@@ -5,7 +5,7 @@ participant "/signup route\n (Flask Blueprint)" as SR
 participant "/verify route\n (Flask Blueprint)" as VR
 participant "UserService" as US
 participant "User Model Object \n (SQLAlchemy\n to Database)" as UM
-participant "Email Service" as Mail
+participant "External \n Email Service" as Mail
 
 == Sign up Process ==
 AppUser -> FE : Navigates to sign up form
@@ -125,5 +125,7 @@ VR <-- US : True
 deactivate US
 FE <-- VR : HTTP Response: 200 OK (Email verified)
 deactivate VR
+activate FE
 AppUser <-- FE : Success Message and redirects to login page
+deactivate FE
 @enduml

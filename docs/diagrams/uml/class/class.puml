@@ -11,6 +11,7 @@ package "Model Classes" {
         + name: str
         + created_at: datetime.datetime {readOnly}
         + updated_at: datetime.datetime {readOnly}
+        + is_deleted: bool
     }
 
     '--------------------------------
@@ -26,6 +27,7 @@ package "Model Classes" {
         + verification_exp_at: datetime.datetime
         + created_at: datetime.datetime {readOnly}
         + updated_at: datetime.datetime {readOnly}
+        + is_deleted: bool
         ' methods --------------------------
         - __hash_secret(secret: str): str
         + update_password(new_plain_password: str): None
@@ -45,6 +47,8 @@ package "Model Classes" {
         + household: Household
         + household_role: HouseholdRole
         + is_accepted: bool
+        + created_at: datetime.datetime {readOnly}
+        + updated_at: datetime.datetime {readOnly}
         + is_deleted: bool
     }
 
@@ -59,6 +63,7 @@ package "Model Classes" {
         + description: str
         + created_at: datetime.datetime {readOnly}
         + updated_at: datetime.datetime {readOnly}
+        + is_deleted: bool
     }
 
     '--------------------------------
@@ -73,9 +78,10 @@ package "Model Classes" {
         + description: str
         + deadline: datetime.date
         + is_done: bool
+        + done_at: datetime.datetime {readOnly}
         + created_at: datetime.datetime {readOnly}
         + updated_at: datetime.datetime {readOnly}
-        + done_at: datetime.datetime {readOnly}
+        + is_deleted: bool
     }
 
     Class ProjectGoal {
@@ -83,6 +89,9 @@ package "Model Classes" {
         + project: Project
         + title: str
         + description: str
+        + created_at: datetime.datetime {readOnly}
+        + updated_at: datetime.datetime {readOnly}
+        + is_deleted: bool
     }
 
     Enum ProjectRole {
@@ -95,6 +104,9 @@ package "Model Classes" {
         + user: User
         + project: Project
         + role: ProjectRole
+        + created_at: datetime.datetime {readOnly}
+        + updated_at: datetime.datetime {readOnly}
+        + is_deleted: bool
     }
 
     '--------------------------------
@@ -112,12 +124,16 @@ package "Model Classes" {
         + is_active: bool
         + created_at: datetime.datetime {readOnly}
         + updated_at: datetime.datetime {readOnly}
+        + is_deleted: bool
     }
 
     Class CustomListItem {
         + id: int {readOnly}
         + household: Household {readOnly}
         + name: str
+        + created_at: datetime.datetime {readOnly}
+        + updated_at: datetime.datetime {readOnly}
+        + is_deleted: bool
     }
 
     Class CustomList_CustomListItem {
@@ -129,6 +145,9 @@ package "Model Classes" {
         + unit: str
         + note: str
         + is_done: bool
+        + created_at: datetime.datetime {readOnly}
+        + updated_at: datetime.datetime {readOnly}
+        + is_deleted: bool
     }
 
     '--------------------------------
@@ -145,9 +164,10 @@ package "Model Classes" {
         + is_recurring: bool
         + title: str
         + description: str
+        + done_at: datetime.datetime {readOnly}
         + created_at: datetime.datetime {readOnly}
         + updated_at: datetime.datetime {readOnly}
-        + done_at: datetime.datetime {readOnly}
+        + is_deleted: bool
     }
 
     Enum Priority {
@@ -168,6 +188,9 @@ package "Model Classes" {
         + id: int {readOnly}
         + user: User
         + task: Task
+        + created_at: datetime.datetime {readOnly}
+        + updated_at: datetime.datetime {readOnly}
+        + is_deleted: bool
     }
 
     Enum RecurrenceCycle {
@@ -182,11 +205,17 @@ package "Model Classes" {
         + recurrence_interval: int
         + next_reset_at: datetime.datetime
         + is_active: bool
+        + created_at: datetime.datetime {readOnly}
+        + updated_at: datetime.datetime {readOnly}
+        + is_deleted: bool
     }
 
     Class NonRecurringTask {
         + project: Project
         + deadline: datetime.datetime
+        + created_at: datetime.datetime {readOnly}
+        + updated_at: datetime.datetime {readOnly}
+        + is_deleted: bool
     }
 
     '--------------------------------
@@ -201,12 +230,16 @@ package "Model Classes" {
         + title: str
         + created_at: datetime.datetime {readOnly}
         + updated_at: datetime.datetime {readOnly}
+        + is_deleted: bool
     }
 
     Class ShoppingListItemCategory {
         + id: int {readOnly}
         + household: Household {readOnly}
         + name: str
+        + created_at: datetime.datetime {readOnly}
+        + updated_at: datetime.datetime {readOnly}
+        + is_deleted: bool
     }
 
     Class ShoppingListItem {
@@ -214,6 +247,9 @@ package "Model Classes" {
         + household: Household {readOnly}
         + category: ShoppingListItemCategory
         + title: str
+        + created_at: datetime.datetime {readOnly}
+        + updated_at: datetime.datetime {readOnly}
+        + is_deleted: bool
     }
 
     Class ShoppingList_ShoppingListItem {
@@ -224,12 +260,12 @@ package "Model Classes" {
         + unit: str
         + note: str
         + is_done: bool
+        + created_at: datetime.datetime {readOnly}
+        + updated_at: datetime.datetime {readOnly}
+        + is_deleted: bool
     }
 }
 newpage
-skinparam {
-'    linetype ortho
-}
 
 package "Model Relations" {
     Enum HouseholdRole
