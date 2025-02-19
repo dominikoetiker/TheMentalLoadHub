@@ -1,0 +1,344 @@
+@startuml
+' US = User Story
+
+left to right direction
+package "Model Classes" {
+    '--------------------------------
+    ' Household
+    '--------------------------------
+    Class Household {
+        + id: int {readOnly}
+        + name: str
+        + created_at: datetime.datetime {readOnly}
+        + updated_at: datetime.datetime {readOnly}
+    }
+
+    '--------------------------------
+    ' User
+    '--------------------------------
+    Class User {
+        + id: int {readOnly}
+        + email: str
+        - __hashed_password: str
+        + unverified_email: str
+        - __hashed_verification_token: str
+        + is_user_verified: bool
+        + verification_exp_at: datetime.datetime
+        + created_at: datetime.datetime {readOnly}
+        + updated_at: datetime.datetime {readOnly}
+        ' methods --------------------------
+        - __hash_secret(secret: str): str
+        + update_password(new_plain_password: str): None
+        + verify_password(plain_password: str): bool
+        + update_verification_token(plain_verification_token: str): None
+        + verify_verification_token(plain_verification_token: str): bool
+    }
+
+    Enum HouseholdRole {
+        administrator = 1
+        user = 2
+    }
+
+    Class Household_User {
+        + household_user_id: int {readOnly}
+        + user: User
+        + household: Household
+        + household_role: HouseholdRole
+        + is_accepted: bool
+        + is_deleted: bool
+    }
+
+    '--------------------------------
+    ' AreaOfResponsibility
+    '--------------------------------
+    Class AreaOfResponsibility {
+        + id: int {readOnly}
+        + household: Household {readOnly}
+        + assigned_to: User
+        + title: str
+        + description: str
+        + created_at: datetime.datetime {readOnly}
+        + updated_at: datetime.datetime {readOnly}
+    }
+
+    '--------------------------------
+    ' Project
+    '--------------------------------
+    Class Project {
+        + id: int {readOnly}
+        + household: Household {readOnly}
+        + created_by: User {readOnly}
+        + area_of_responsibility: AreaOfResponsibility
+        + title: str
+        + description: str
+        + deadline: datetime.date
+        + is_done: bool
+        + created_at: datetime.datetime {readOnly}
+        + updated_at: datetime.datetime {readOnly}
+        + done_at: datetime.datetime {readOnly}
+    }
+
+    Class ProjectGoal {
+        + id: int {readOnly}
+        + project: Project
+        + title: str
+        + description: str
+    }
+
+    Enum ProjectRole {
+        project_manager = 1
+        contributor = 2
+    }
+
+    Class User_Project {
+        + id: int {readOnly}
+        + user: User
+        + project: Project
+        + role: ProjectRole
+    }
+
+    '--------------------------------
+    ' CustomList
+    '--------------------------------
+    Class CustomList {
+        + id: int {readOnly}
+        + household: Household {readOnly}
+        + created_by: User {readOnly}
+        + area_of_responsibility: AreaOfResponsibility
+        + project: Project
+        + title: str
+        + description: str
+        + is_checklist: bool
+        + is_active: bool
+        + created_at: datetime.datetime {readOnly}
+        + updated_at: datetime.datetime {readOnly}
+    }
+
+    Class CustomListItem {
+        + id: int {readOnly}
+        + household: Household {readOnly}
+        + name: str
+    }
+
+    Class CustomList_CustomListItem {
+        + id: int {readOnly}
+        + list: CustomList
+        + item: CustomListItem
+        + parent: CustomList_CustomListItem
+        + quantity: float
+        + unit: str
+        + note: str
+        + is_done: bool
+    }
+
+    '--------------------------------
+    ' Task
+    '--------------------------------
+    Class Task {
+        + id: int {readOnly}
+        + household: Household {readOnly}
+        + area_of_responsibility: AreaOfResponsibility
+        + created_by: User {readOnly}
+        + assigned_to: User
+        + priority: Priority
+        + status: Status
+        + is_recurring: bool
+        + title: str
+        + description: str
+        + created_at: datetime.datetime {readOnly}
+        + updated_at: datetime.datetime {readOnly}
+        + done_at: datetime.datetime {readOnly}
+    }
+
+    Enum Priority {
+        urgent = 1
+        high = 2
+        medium = 3
+        low = 4
+    }
+
+    Enum Status {
+        backlog = 1
+        to_do = 2
+        in_progress = 3
+        done = 4
+    }
+
+    Class Task_TaskHelper {
+        + id: int {readOnly}
+        + user: User
+        + task: Task
+    }
+
+    Enum RecurrenceCycle {
+        daily = 1
+        weekly = 2
+        monthly = 3
+        yearly = 4
+    }
+
+    Class RecurringTask {
+        + recurrence_cycle: RecurrenceCycle
+        + recurrence_interval: int
+        + next_reset_at: datetime.datetime
+        + is_active: bool
+    }
+
+    Class NonRecurringTask {
+        + project: Project
+        + deadline: datetime.datetime
+    }
+
+    '--------------------------------
+    ' ShoppingList
+    '--------------------------------
+    Class ShoppingList {
+        + id: int {readOnly}
+        + household: Household {readOnly}
+        + created_by: User {readOnly}
+        + project: Project
+        + area_of_responsibility: AreaOfResponsibility
+        + title: str
+        + created_at: datetime.datetime {readOnly}
+        + updated_at: datetime.datetime {readOnly}
+    }
+
+    Class ShoppingListItemCategory {
+        + id: int {readOnly}
+        + household: Household {readOnly}
+        + name: str
+    }
+
+    Class ShoppingListItem {
+        + id: int {readOnly}
+        + household: Household {readOnly}
+        + category: ShoppingListItemCategory
+        + title: str
+    }
+
+    Class ShoppingList_ShoppingListItem {
+        + id: int {readOnly}
+        + list: ShoppingList
+        + item: ShoppingListItem
+        + quantity: float
+        + unit: str
+        + note: str
+        + is_done: bool
+    }
+}
+newpage
+skinparam {
+'    linetype ortho
+}
+
+package "Model Relations" {
+    Enum HouseholdRole
+    Enum ProjectRole
+    Enum Priority
+    Enum Status
+    Enum RecurrenceCycle
+    '--------------------------------
+    ' Relations
+    '--------------------------------
+    User "1" *-- "0..*" Household_User : "belongs to"
+    Household_User "0..*" --* "1" Household : "belongs to"
+    Household_User "0..*" --* "1" HouseholdRole : "has a"
+
+    AreaOfResponsibility "0..*" ---* "1" Household : "belongs to"
+    Project "0..*" ---* "1" Household: "belongs to"
+    CustomList "0..*" ---* "1" Household: "belongs to"
+    CustomListItem "0..*" ---* "1" Household : "belongs to"
+    Task "0..*" ---* "1" Household : "belongs to"
+    ShoppingList "0..*" ---* "1" Household : "belongs to"
+    ShoppingListItem "0..*" ---* "1" Household : "belongs to"
+    ShoppingListItemCategory "0..*" ---* "1" Household : "belongs to"
+
+    Project "1" *-- "0..*" ProjectGoal : "has"
+    User_Project "0..*" -- "1" Project : "involved in"
+    User_Project "0..*" -- "1" ProjectRole : "involved as"
+
+    CustomList "1" *-- "0..*" CustomList_CustomListItem : "consists of"
+    CustomList_CustomListItem "0..*" -- "1" CustomListItem : "has a"
+    CustomList_CustomListItem "0..*" -- "0..1" CustomList_CustomListItem : "is child of"
+
+    Task "0..*" -- "1" Priority : "has a"
+    Task "0..*" -- "1" Status : "has a"
+    Task_TaskHelper "0..*" -- "1" Task : "helps"
+
+    RecurringTask  "0..*" - "1" RecurrenceCycle : "has"
+
+    ' Inheritance NonRecurring- and Recurring Tasks from Task
+    NonRecurringTask --|> Task : "is a"
+    RecurringTask --|> Task : "is a"
+
+    ShoppingList "1" *-- "0..*" ShoppingList_ShoppingListItem : "consists of"
+    ShoppingList_ShoppingListItem "0..*" -- "1" ShoppingListItem : "has a"
+    ShoppingListItem "0..*" -- "1" ShoppingListItemCategory : "categorized by"
+
+    User "1" --- "0..*" Task : "creator"
+    User "1" --- "0..*" Task : "assignee"
+    User "1" --- "0..*" Task_TaskHelper : "helps"
+    User "1" --- "0..*" Project : "creator"
+    User "1" --- "0..*" User_Project : "involved"
+    User "1" --- "0..*" CustomList : "creator"
+    User "1" --- "0..*" ShoppingList : "creator"
+    User "1" --- "0..*" AreaOfResponsibility : "assignee"
+
+    CustomList "0..*" --- "0..1" AreaOfResponsibility : "categorized by"
+    Task "0..*" --- "0..1" AreaOfResponsibility : "categorized by"
+    Project "0..*" --- "0..1" AreaOfResponsibility : "categorized by"
+    ShoppingList "0..*" --- "0..1" AreaOfResponsibility : "categorized by"
+
+    CustomList "0..*" ---o "0..1" Project : "belongs to"
+    NonRecurringTask "0..*" ---o "0..1" Project : "belongs to"
+    ShoppingList "0..*" ---o "0..1" Project : "belongs to"
+}
+
+newpage
+
+package "Services Classes" {
+    '--------------------------------
+    ' Services MVP only
+    '--------------------------------
+    Class UserService {
+        + query_users_by_mail(email: str): User
+        + query_users_by_unverified_mail_and_not_expired_verification(unverified_email: str): User
+        + is_email_format_valid(email: str): bool
+        + create_user(email: str, plain_password: str): User
+        - __create_verification_token(): str
+        - __create_verification_link(plain_verification_token: str, email: str): str
+        - __send_verification_mail(verification_link: str): None
+        + verify_email(user: User, verification_token: str): bool
+    }
+
+    Class HouseholdService {
+        ' US #12 #13
+        + create_household(name: str, creator: User): Household
+        ' US #15
+        + query_household_list_by_household_admin(household_admin: User): List[Household]
+        ' US #13
+        + assign_household_role(user: User, role: HouseholdRole): None
+    }
+
+    Class AuthService {
+    }
+
+    Class TaskService {
+    }
+
+    Class RecurringTaskService {
+    }
+
+    Class NonRecurringTaskService {
+    }
+
+    ' Post MVP:
+    Class AreaOfResponsibilityService {}
+    Class ProjectService {}
+    Class CustomListService {}
+    Class CustomListItemService {}
+    Class ShoppingListService {}
+    Class ShoppingListItemCategoryService {}
+    Class ShoppingListItemService
+}
+@enduml
