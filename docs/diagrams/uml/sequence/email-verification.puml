@@ -1,5 +1,5 @@
 @startuml
-actor "New User" as AppUser
+actor "User" as AppUser
 participant "Frontend (React)" as FE
 participant "/verify route\n (Flask Blueprint)" as VR
 participant "UserService" as US
