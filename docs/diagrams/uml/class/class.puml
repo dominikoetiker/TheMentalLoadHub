@@ -345,6 +345,7 @@ package "Services Classes" {
         - __create_verification_link(plain_verification_token: str, email: str): str
         - __send_verification_mail(verification_link: str): None
         + verify_email(user: User, verification_token: str): bool
+        + verify_password(user: User, plain_password: str): bool
     }
 
     Class HouseholdService {
@@ -357,6 +358,8 @@ package "Services Classes" {
     }
 
     Class AuthService {
+        + generate_jwt(user: User): str
+        + verify_jwt(jwt: str): User
     }
 
     Class TaskService {

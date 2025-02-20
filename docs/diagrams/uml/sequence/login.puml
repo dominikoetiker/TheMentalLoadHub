@@ -1,0 +1,71 @@
+@startuml
+actor "User" as AppUser
+participant "Frontend (React)" as FE
+participant "/login route\n(Flask Blueprint)" as LR
+participant "UserService" as US
+participant "AuthService" as AS
+participant "User Model Object\n(SQLAlchemy to Database)" as UM
+
+== Login Process (User Story #25) ==
+AppUser -> FE : Navigates to login form
+activate FE
+AppUser <-- FE : Display login form
+deactivate FE
+AppUser -> FE : Enters credentials {email, plain_password}
+activate FE
+FE -> LR : HTTP POST {email, plain_password}
+deactivate FE
+activate LR
+LR -> US : is_email_format_valid(email)
+activate US
+alt Email format not valid
+    LR <-- US : False
+    FE <-- LR : HTTP Response: 401 Unauthorized (Credentials not valid)
+    activate FE
+    AppUser <-- FE : Error: Invalid Credentials
+    deactivate FE
+end
+LR <-- US : True
+deactivate US
+LR -> US : query_user_by_email(email)
+activate US
+alt User not found
+    LR <-- US : None
+    FE <-- LR : HTTP Response: 401 Unauthorized (Credentials not valid)
+    activate FE
+    AppUser <-- FE : Error: Invalid Credentials
+    deactivate FE
+end
+LR <-- US : User object
+deactivate US
+
+LR -> US : verify_password(User, plain_password)
+activate US
+US -> UM : verify_password(plain_password)
+activate UM
+UM -> UM : __hash_secret(plain_password)
+activate UM
+deactivate UM
+alt Password mismatch
+    US <-- UM : False
+    LR <-- US : False
+    FE <-- LR : HTTP Response: 401 Unauthorized (Credentials not valid)
+    activate FE
+    AppUser <-- FE : Error: Invalid Credentials
+    deactivate FE
+end
+US <-- UM : True
+deactivate UM
+LR <-- US : True
+deactivate US
+
+LR -> AS : generate_jwt(User)
+activate AS
+LR <-- AS : jwt: str
+deactivate AS
+FE <-- LR : HTTP Response: 200 OK {jwt}
+deactivate LR
+activate FE
+AppUser <-- FE : Login Success (redirect to dashboard)
+deactivate FE
+@enduml
