@@ -39,8 +39,8 @@ design is refined based on feedback and testing.
     - Model Relations: [class-1.svg](docs/diagrams/uml/class/class-1.svg)
     - Service Classes: [class-2.svg](docs/diagrams/uml/class/class-2.svg)
 - Sequence Diagram
-    - Sign up I  (UML): [user_registration.svg](docs/diagrams/uml/sequence/sign_up-0.svg)
-    - Sign up II (UML): [user_registration.svg](docs/diagrams/uml/sequence/sign_up-1.svg)
+    - Sign up (UML): [sign_up-0.svg](docs/diagrams/uml/sequence/sign_up-0.svg)
+    - Email verification (UML): [email-verification-0.svg](docs/diagrams/uml/sequence/email-verification-0.svg)
 
 ## License
 
