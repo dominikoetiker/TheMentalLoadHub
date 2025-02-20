@@ -1,0 +1,63 @@
+@startuml
+actor "New User" as AppUser
+participant "Frontend (React)" as FE
+participant "/verify route\n (Flask Blueprint)" as VR
+participant "UserService" as US
+participant "User Model Object \n (SQLAlchemy\n to Database)" as UM
+
+== E-Mail Verification ==
+AppUser -> FE : clicks link (send email and token)
+activate FE
+FE -> VR : HTTP Request: GET {email, plain_verification_token}
+deactivate FE
+activate VR
+VR -> US : is_email_format_valid(email)
+activate US
+alt Email format not valid
+    VR <-- US : False
+    FE <-- VR : HTTP Response: 404 Not Found
+    activate FE
+    AppUser <-- FE : Error: link not valid
+    deactivate FE
+end
+VR <-- US : True
+deactivate US
+VR -> US : query_users_by_unverified_mail_and_not_expired_verification(unverified_email: str)
+activate US
+alt Unverified Mail does not exist or expired
+    VR <-- US : None
+    FE <-- VR : HTTP Response: 404 Not Found
+    activate FE
+    AppUser <-- FE : Error: link not valid
+    deactivate FE
+end
+VR <-- US : User object
+deactivate US
+VR -> US : verify_email(User, plain_verification_token)
+activate US
+US -> UM : verify_verification_token(plain_verification_token)
+activate UM
+UM -> UM : __hash_secret(plain_verification_token)
+activate UM
+deactivate UM
+alt verification token does not match
+    US <-- UM : False
+    VR <-- US : False
+    FE <-- VR : HTTP Response: 404 Not Found
+    activate FE
+    AppUser <-- FE : Error: link not valid
+    deactivate FE
+end
+US <-- UM : True
+US -> UM : is_user_verified = True
+US -> UM : email = unverified_email
+US -> UM : unverified_email = ""
+deactivate UM
+VR <-- US : True
+deactivate US
+FE <-- VR : HTTP Response: 200 OK (Email verified)
+deactivate VR
+activate FE
+AppUser <-- FE : Success Message and redirects to login page
+deactivate FE
+@enduml
