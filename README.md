@@ -36,32 +36,36 @@ design is refined based on feedback and testing.
 - [x] Database Schema: [database_schema.sql](docs/database/database_schema.sql)
 - [x] Use Case Diagram: [use_case.svg](docs/diagrams/uml/use_case/use_case.svg)
 - [ ] **Class Diagram for backend**
-  - [x] Model Classes: [class-0.svg](docs/diagrams/uml/class/class-0.svg)
-  - [x] Model Relations: [class-1.svg](docs/diagrams/uml/class/class-1.svg)
-  - [ ] Service Classes: [class-2.svg](docs/diagrams/uml/class/class-2.svg)
+    - [x] Model Classes: [class-0.svg](docs/diagrams/uml/class/class-0.svg)
+    - [x] Model Relations: [class-1.svg](docs/diagrams/uml/class/class-1.svg)
+    - [ ] Service Classes: [class-2.svg](docs/diagrams/uml/class/class-2.svg)
 - [ ] **Sequence Diagrams**
-  - [ ] **Account management**
-    - [x] Sign up (#23): [sign_up-0.svg](docs/diagrams/uml/sequence/sign_up-0.svg)
-    - [x] Email verification (#23, 27): [email-verification-0.svg](docs/diagrams/uml/sequence/email-verification-0.svg)
-    - [ ] Login (#25): [login-0.svg](docs/diagrams/uml/sequence/login-0.svg)
-    - [ ] Logout (#26):
-    - [ ] Update account (#24, #27)
-    - [ ] Reset password (#28)
-    - [ ] Delete account
-  - [ ] **Household management**
-    - [ ] Create household (#12, #13)
-    - [ ] Update household (#16)
-    - [ ] Delete household (#15)
-    - [ ] Add member (#18)
-    - [ ] Remove member (#19)
-    - [ ] Assign admin role (#20)
-    - [ ] Remove admin role
-    - [ ] View household members (#30)
-  - [ ] **Task management**
-    -[ ] Create recurring task (#34, #35, #38, #39)
-    -[ ] Create non recurring task (#34, #35, #41)
-    -[ ] Update recurring task (#38, #39, #40, #45, #46, #47)
-    -[ ] Update non recurring task (#41, #45, #47)
+    - [ ] **Account management**
+        - [x] Sign up (#23): [sign_up-0.svg](docs/diagrams/uml/sequence/sign_up-0.svg)
+        - [x] Email verification (#23,
+          27): [email-verification-0.svg](docs/diagrams/uml/sequence/email-verification-0.svg)
+        - [x] Login (#25): [login-0.svg](docs/diagrams/uml/sequence/login-0.svg)
+        - [ ] Verify JWT:
+        - [ ] Refresh JWT:
+        - [ ] Revoke JWT:
+        - [ ] Logout (#26):
+        - [ ] Update account (#24, #27)
+        - [ ] Reset password (#28)
+        - [ ] Delete account
+    - [ ] **Household management**
+        - [ ] Create household (#12, #13)
+        - [ ] Update household (#16)
+        - [ ] Delete household (#15)
+        - [ ] Add member (#18)
+        - [ ] Remove member (#19)
+        - [ ] Assign admin role (#20)
+        - [ ] Remove admin role
+        - [ ] View household members (#30)
+    - [ ] **Task management**
+        -[ ] Create recurring task (#34, #35, #38, #39)
+        -[ ] Create non recurring task (#34, #35, #41)
+        -[ ] Update recurring task (#38, #39, #40, #45, #46, #47)
+        -[ ] Update non recurring task (#41, #45, #47)
 
 ## License
 
