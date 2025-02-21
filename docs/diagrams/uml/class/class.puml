@@ -4,6 +4,19 @@
 left to right direction
 package "Model Classes" {
     '--------------------------------
+    ' JWT Token blacklist
+    '--------------------------------
+    Class BlacklistedJWT {
+        + blacklisted_jwt_id: int
+        - __hashed_jwt: str
+        + user_id: int
+        + blacklisted_at: datetime.datetime
+        + expires_at: datetime.datetime
+        + is_token_blacklisted(plain_jwt): book
+        - __hash_secret(secret: str): str
+    }
+
+    '--------------------------------
     ' Household
     '--------------------------------
     Class Household {
@@ -336,16 +349,37 @@ package "Services Classes" {
     '--------------------------------
     ' Services MVP only
     '--------------------------------
+    Class AuthService {
+        + generate_jwt(user: User): str
+        + verify_jwt(jwt: str): User
+        + verify_password(user: User, plain_password: str): bool
+        - __query_blacklisted_jwt(user_id, expires_at): List[BlacklistedJWT]
+        - __is_jwt_blacklisted(jwt: str, List[BlacklistedJWT]
+        + blacklist_jwt(jwt: str, user_id: int, expires_at: datetime.datetime): None
+    }
+    note bottom
+        JWT Format:
+        Header.alg: HS256
+        Header.typ: JWT
+        Payload.iss: thementalloadhub
+        Payload.iat: issued_at (datetime.datetime)
+        Payload.sub: user_id (int)
+        Payload.exp: expiration_time (datetime.datetime)
+        Signature: HS256
+    end note
+
+    Class EmailVerificationService {
+        + is_email_format_valid(email: str): bool
+        + create_verification_token(): str
+        + send_verification_mail(verification_link: str): None
+        - __create_verification_link(plain_verification_token: str, email: str): str
+        + verify_email(user: User, verification_token: str): bool
+    }
+
     Class UserService {
         + query_users_by_mail(email: str): User
         + query_users_by_unverified_mail_and_not_expired_verification(unverified_email: str): User
-        + is_email_format_valid(email: str): bool
-        + create_user(email: str, plain_password: str): User
-        - __create_verification_token(): str
-        - __create_verification_link(plain_verification_token: str, email: str): str
-        - __send_verification_mail(verification_link: str): None
-        + verify_email(user: User, verification_token: str): bool
-        + verify_password(user: User, plain_password: str): bool
+        + create_user(unverified_email: str, plain_password: str, plain_verification_token: str): User
     }
 
     Class HouseholdService {
@@ -355,11 +389,6 @@ package "Services Classes" {
         + query_household_list_by_household_admin(household_admin: User): List[Household]
         ' US #13
         + assign_household_role(user: User, role: HouseholdRole): None
-    }
-
-    Class AuthService {
-        + generate_jwt(user: User): str
-        + verify_jwt(jwt: str): User
     }
 
     Class TaskService {

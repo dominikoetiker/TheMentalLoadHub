@@ -3,10 +3,11 @@ actor "New User" as AppUser
 participant "Frontend (React)" as FE
 participant "/signup route\n (Flask Blueprint)" as SR
 participant "UserService" as US
+participant "EmailVerificationService" as AS
 participant "User Model Object \n (SQLAlchemy\n to Database)" as UM
 participant "External \n Email Service" as Mail
 
-== Sign up Process ==
+== Sign up Process (User story #23) ==
 AppUser -> FE : Navigates to sign up form
 activate FE
 AppUser <-- FE : Sign up form
@@ -14,17 +15,17 @@ AppUser -> FE : Fills sign up form {email, plain_password} and submits
 FE -> SR : HTTP Request: POST {email, plain_password}
 deactivate FE
 activate SR
-SR -> US : is_email_format_valid(email)
-activate US
+SR -> AS : is_email_format_valid(email)
+activate AS
 alt Email format not valid
-    SR <-- US : False
+    SR <-- AS : False
     FE <-- SR : HTTP Response: 400 Bad Request (Email format not valid)
     activate FE
     AppUser <-- FE : Error: Email format not valid, try again
     deactivate FE
 end
-SR <-- US : True
-deactivate US
+SR <-- AS : True
+deactivate AS
 SR -> US : query_users_by_mail(email)
 activate US
 alt Account already exists
@@ -36,11 +37,12 @@ alt Account already exists
 end
 SR <-- US : None
 deactivate US
-SR -> US : create_user(email, plain_password)
+SR -> AS : create_verification_token()
+activate AS
+SR <-- AS : verification_token
+deactivate AS
+SR -> US : create_user(unverified_email, plain_password, plain_verification_token)
 activate US
-US -> US : __create_verification_token()
-activate US
-deactivate US
 US -> UM : new(unverified_email, plain_password, plain_verification_token)
 activate UM
 UM -> UM : __hash_secret(password)
@@ -54,16 +56,18 @@ activate UM
 deactivate UM
 US <-- UM : User (object)
 deactivate UM
-US -> US : __create_verification_link(plain_verification_token, unverified_email)
-activate US
-deactivate US
-US -> US : __send_verification_mail(verification_link)
-activate US
-US -> Mail : send email {verification_link, email}
-activate Mail
-deactivate US
 SR <-- US : User (object)
 deactivate US
+SR -> AS : send_verification_mail(verification_token, unverified_email)
+activate AS
+AS -> AS : __create_verification_link(plain_verification_token, unverified_email)
+activate AS
+deactivate AS
+AS -> Mail : send email {verification_link, email}
+activate Mail
+SR <-- AS : User (object)
+deactivate AS
+deactivate AS
 FE <-- SR : HTTP Response: 201 Created (User created)
 deactivate SR
 activate FE
