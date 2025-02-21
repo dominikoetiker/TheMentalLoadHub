@@ -6,7 +6,7 @@ participant "UserService" as US
 participant "EmailVerificationService" as ES
 participant "User Model Object \n (SQLAlchemy\n to Database)" as UM
 
-== E-Mail Verification ==
+== E-Mail Verification (User stories #23, #27) ==
 AppUser -> FE : clicks link (send email and token)
 activate FE
 FE -> VR : HTTP Request: GET {email, plain_verification_token}
