@@ -21,17 +21,26 @@ DROP TABLE IF EXISTS AreaOfResponsibility;
 DROP TABLE IF EXISTS Household_User;
 DROP TABLE IF EXISTS User;
 DROP TABLE IF EXISTS Household;
-DROP TABLE IF EXISTS JWT_Token_Blacklist;
+DROP TABLE IF EXISTS JWTAccessTokenBlacklist;
 
 
-CREATE TABLE JWT_Token_Blacklist
+CREATE TABLE JWTAccessTokenBlacklist
 (
-    jwt_token_id   INT AUTO_INCREMENT,
-    hashed_token   VARCHAR(255) NOT NULL,
-    user_id        INT,
-    blacklisted_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    expires_at     DATETIME     NOT NULL,
-    PRIMARY KEY (jwt_token_id),
+    jti          VARCHAR(36),
+    hashed_token VARCHAR(255) NOT NULL,
+    expires_at   DATETIME     NOT NULL,
+    PRIMARY KEY (jti),
+    UNIQUE (hashed_token)
+);
+
+CREATE TABLE JWTRefreshTokenWhitelist
+(
+    jti          VARCHAR(36),
+    hashed_token VARCHAR(255) NOT NULL,
+    user_agent   VARCHAR(255) NOT NULL,
+    ip_address   VARCHAR(45)  NOT NULL,
+    expires_at   DATETIME     NOT NULL,
+    PRIMARY KEY (jti),
     UNIQUE (hashed_token)
 );
 
@@ -397,7 +406,19 @@ DELIMITER //
 CREATE EVENT delete_blacklisted_tokens
     ON SCHEDULE EVERY 1 DAY
     DO DELETE
-       FROM JWT_Token_Blacklist
+       FROM JWTAccessTokenBlacklist
+       WHERE expires_at < CURRENT_TIMESTAMP;
+//
+DELIMITER ;
+
+/*
+Delete expired refresh tokens
+*/
+DELIMITER //
+CREATE EVENT delete_expired_refresh_tokens
+    ON SCHEDULE EVERY 1 DAY
+    DO DELETE
+       FROM JWTRefreshTokenWhitelist
        WHERE expires_at < CURRENT_TIMESTAMP;
 //
 DELIMITER ;
