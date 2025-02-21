@@ -4,15 +4,26 @@
 left to right direction
 package "Model Classes" {
     '--------------------------------
-    ' JWT Token blacklist
+    ' Blacklisted JWT Access Token
     '--------------------------------
-    Class BlacklistedJWT {
-        + blacklisted_jwt_id: int
+    Class BlacklistedJWTAccessToken {
+        + jti: str
         - __hashed_jwt: str
-        + user_id: int
-        + blacklisted_at: datetime.datetime
         + expires_at: datetime.datetime
-        + is_token_blacklisted(plain_jwt): book
+        + is_token_blacklisted(plain_jwt): bool
+        - __hash_secret(secret: str): str
+    }
+
+    '--------------------------------
+    ' Whitelisted JWT Refresh Token
+    '--------------------------------
+    Class WhitelistedJWTRefreshToken {
+        + jti: str
+        - __hashed_jwt: str
+        + user_agent: str
+        + ip_address: str
+        + expires_at: datetime.datetime
+        + is_token_whitelisted(plain_jwt): bool
         - __hash_secret(secret: str): str
     }
 
@@ -350,22 +361,35 @@ package "Services Classes" {
     ' Services MVP only
     '--------------------------------
     Class AuthService {
-        + generate_jwt(user: User): str
-        + verify_jwt(jwt: str): User
+        + generate_access_jwt(user: User): str
+        + generate_refresh_jwt(user: User): str
+        + verify_access_jwt(jwt: str): User
         + verify_password(user: User, plain_password: str): bool
         - __query_blacklisted_jwt(user_id, expires_at): List[BlacklistedJWT]
         - __is_jwt_blacklisted(jwt: str, List[BlacklistedJWT]
         + blacklist_jwt(jwt: str, user_id: int, expires_at: datetime.datetime): None
     }
     note bottom
-        JWT Format:
-        Header.alg: HS256
-        Header.typ: JWT
-        Payload.iss: thementalloadhub
-        Payload.iat: issued_at (datetime.datetime)
-        Payload.sub: user_id (int)
-        Payload.exp: expiration_time (datetime.datetime)
-        Signature: HS256
+        JWT Access Token Format:
+            Header.alg: HS256
+            Header.typ: JWT
+            Payload.jti: uuid (str)
+            Payload.refresh_jti: uuid (str)
+            Payload.iss: thementalloadhub
+            Payload.iat: issued_at (datetime.datetime)
+            Payload.sub: user_id (int)
+            Payload.exp: expiration_time (datetime.datetime)
+            Signature: HS256
+
+        JWT Refresh Token Format:
+            Header.alg: HS256
+            Header.typ: JWT
+            Payload.jti: uuid (str)
+            Payload.iss: thementalloadhub
+            Payload.iat: issued_at (datetime.datetime)
+            Payload.sub: user_id (int)
+            Payload.exp: expiration_time (datetime.datetime)
+            Signature: HS256
     end note
 
     Class EmailVerificationService {
