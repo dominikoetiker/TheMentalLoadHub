@@ -378,7 +378,7 @@ package "Services Classes" {
             Payload.iss: thementalloadhub
             Payload.iat: issued_at (datetime.datetime)
             Payload.sub: user_id (int)
-            Payload.exp: expiration_time (datetime.datetime)
+            Payload.exp: expiration_time (datetime.datetime {now + 5 minutes})
             Signature: HS256
 
         JWT Refresh Token Format:
@@ -388,7 +388,7 @@ package "Services Classes" {
             Payload.iss: thementalloadhub
             Payload.iat: issued_at (datetime.datetime)
             Payload.sub: user_id (int)
-            Payload.exp: expiration_time (datetime.datetime)
+            Payload.exp: expiration_time (datetime.datetime {now + 31 days})
             Signature: HS256
     end note
 
