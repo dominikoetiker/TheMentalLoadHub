@@ -1,3 +1,4 @@
+DROP EVENT IF EXISTS delete_blacklisted_tokens;
 DROP TRIGGER IF EXISTS delete_task_at_project_delete;
 DROP TRIGGER IF EXISTS insert_child_table_record_at_task_insert;
 DROP TRIGGER IF EXISTS update_task_done_at;
@@ -20,7 +21,19 @@ DROP TABLE IF EXISTS AreaOfResponsibility;
 DROP TABLE IF EXISTS Household_User;
 DROP TABLE IF EXISTS User;
 DROP TABLE IF EXISTS Household;
+DROP TABLE IF EXISTS JWT_Token_Blacklist;
 
+
+CREATE TABLE JWT_Token_Blacklist
+(
+    jwt_token_id   INT AUTO_INCREMENT,
+    hashed_token   VARCHAR(255) NOT NULL,
+    user_id        INT,
+    blacklisted_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at     DATETIME     NOT NULL,
+    PRIMARY KEY (jwt_token_id),
+    UNIQUE (hashed_token)
+);
 
 CREATE TABLE Household
 (
@@ -372,5 +385,19 @@ BEGIN
     FROM Task
     WHERE task_id = OLD.task_id;
 END;
+//
+DELIMITER ;
+
+/*
+ Delete blacklisted tokens, when they expire
+*/
+SET GLOBAL event_scheduler = ON;
+
+DELIMITER //
+CREATE EVENT delete_blacklisted_tokens
+    ON SCHEDULE EVERY 1 DAY
+    DO DELETE
+       FROM JWT_Token_Blacklist
+       WHERE expires_at < CURRENT_TIMESTAMP;
 //
 DELIMITER ;
