@@ -1,0 +1,31 @@
+@startuml
+participant "/[any] route\n(Flask Blueprint)" as AR
+participant "AuthService" as AS
+participant "WhitelistedJWTRefreshToken\nModel Object\n(SQLAlchemy to Database)" as WM
+
+== (Generic) Create JWT ==
+activate AR
+AR -> AS : create_jwt(user, user_agent, ip_address)
+activate AS
+AS -> AS : __create_refresh_jwt(user: User)
+activate AS
+AS -> AS : __encode_jwt(refresh_jwt)
+activate AS
+deactivate AS
+AS -> WM : new(refres_jti, encoded_refresh_jwt, user_agent, ip_address, expires_at)
+activate WM
+WM -> WM : __hash_secret(refresh_jwt)
+activate WM
+deactivate WM
+deactivate WM
+AS <-- AS : Tuple[refresh_jti: str, encoded_refresh_jwt: str]
+deactivate AS
+AS -> AS : __create_access_jwt(user, refresh_jti)
+activate AS
+AS -> AS : __encode_jwt(access_jwt)
+activate AS
+deactivate AS
+deactivate AS
+AR <-- AS : Tuple[access_jwt, refresh_jwt]
+deactivate AS
+@enduml

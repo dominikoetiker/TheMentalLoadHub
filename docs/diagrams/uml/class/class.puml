@@ -361,10 +361,9 @@ package "Services Classes" {
     ' Services MVP only
     '--------------------------------
     Class AuthService {
-        + create_access_jwt(user: User, refresh_jti: str): str
-        - __generate_access_jwt(user: User, refresh_jti: str): str
-        + create_refresh_jwt(user: User, user_agent: str, ip_address: str): Tuple[str, str]
-        - __generate_refresh_jwt(user: User): str
+        + create_jwt(user: User, user_agent: str, ip_address: str): Tuple[access_jwt: str, refresh_jwt: str]
+        - __create_refresh_jwt(user: User): Tuple[refresh_jti: str, refresh_jwt: str]
+        - __create_access_jwt(user: User, refresh_jti: str): str
         - __encode_jwt(jwt: str): str
         - __decode_jwt(jwt: str): str
         + verify_access_jwt(jwt: str): User
