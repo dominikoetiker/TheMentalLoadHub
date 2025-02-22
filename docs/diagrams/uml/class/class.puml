@@ -361,8 +361,10 @@ package "Services Classes" {
     ' Services MVP only
     '--------------------------------
     Class AuthService {
-        + generate_access_jwt(user: User): str
-        + generate_refresh_jwt(user: User): str
+        + create_access_jwt(user: User, refresh_jti: str): str
+        + create_refresh_jwt(user: User, user_agent: str, ip_address: str): Tuple[str, str]
+        - __generate_refresh_jwt(user: User): str
+        - __encode_jwt(jwt: str): str
         + verify_access_jwt(jwt: str): User
         + verify_password(user: User, plain_password: str): bool
         - __query_blacklisted_jwt(user_id, expires_at): List[BlacklistedJWT]

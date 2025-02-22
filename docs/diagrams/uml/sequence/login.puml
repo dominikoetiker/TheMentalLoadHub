@@ -2,70 +2,90 @@
 actor "User" as AppUser
 participant "Frontend (React)" as FE
 participant "/login route\n(Flask Blueprint)" as LR
-participant "UserService" as US
+participant "EmailVerificationService" as ES
 participant "AuthService" as AS
+participant "UserService" as US
+participant "WhitelistedJWTRefreshToken\nModel Object\n(SQLAlchemy to Database)" as WM
 participant "User Model Object\n(SQLAlchemy to Database)" as UM
 
 == Login Process (User Story #25) ==
-AppUser -> FE : Navigates to login form
+AppUser -> FE: Submits login credentials
 activate FE
-AppUser <-- FE : Display login form
-deactivate FE
-AppUser -> FE : Enters credentials {email, plain_password}
-activate FE
-FE -> LR : HTTP POST {email, plain_password}
+FE -> LR : HTTP Request: POST {email, plain_password, [user_agent, ip_address]}
 deactivate FE
 activate LR
-LR -> US : is_email_format_valid(email)
-activate US
+LR -> ES : is_email_format_valid(email)
+activate ES
+alt
 alt Email format not valid
-    LR <-- US : False
-    FE <-- LR : HTTP Response: 401 Unauthorized (Credentials not valid)
+    LR <-- ES : False
+    FE <-- LR : HTTP Response: 404 Not Found
     activate FE
-    AppUser <-- FE : Error: Invalid Credentials
+    AppUser <-- FE : Error: credentials not valid
     deactivate FE
 end
-LR <-- US : True
-deactivate US
-LR -> US : query_user_by_email(email)
+LR <-- ES : True
+deactivate ES
+LR -> US : query_users_by_mail(email)
 activate US
-alt User not found
+alt Unverified Mail does not exist or expired
     LR <-- US : None
-    FE <-- LR : HTTP Response: 401 Unauthorized (Credentials not valid)
+    FE <-- LR : HTTP Response: 404 Not Found
     activate FE
-    AppUser <-- FE : Error: Invalid Credentials
+    AppUser <-- FE : Error: credentials not valid
     deactivate FE
 end
 LR <-- US : User object
 deactivate US
-
-LR -> US : verify_password(User, plain_password)
-activate US
-US -> UM : verify_password(plain_password)
+LR -> AS : verify_password(user, plain_password)
+activate AS
+AS -> UM : verify_password(plain_password)
 activate UM
 UM -> UM : __hash_secret(plain_password)
 activate UM
 deactivate UM
-alt Password mismatch
-    US <-- UM : False
-    LR <-- US : False
-    FE <-- LR : HTTP Response: 401 Unauthorized (Credentials not valid)
+alt Password does not match
+    AS <-- UM : False
+    LR <-- AS : False
+    FE <-- LR : HTTP Response: 404 Not Found
     activate FE
-    AppUser <-- FE : Error: Invalid Credentials
+    AppUser <-- FE : Error: credentials not valid
     deactivate FE
 end
-US <-- UM : True
+AS <-- UM : True
 deactivate UM
-LR <-- US : True
-deactivate US
-
-LR -> AS : generate_jwt(User)
-activate AS
-LR <-- AS : jwt: str
+LR <-- AS : True
 deactivate AS
-FE <-- LR : HTTP Response: 200 OK {jwt}
+LR -> AS : create_refresh_jwt(user, user_agent, ip_address)
+activate AS
+AS -> AS : __generate_refresh_jwt(user)
+activate AS
+deactivate AS
+AS -> AS : __encode_jwt(refresh_jwt)
+activate AS
+deactivate AS
+AS -> WM : create(jti, encoded_refresh_jwt, user_agent, ip_address, expires_at)
+activate WM
+WM -> WM : __hash_secret(refresh_jwt)
+activate WM
+deactivate WM
+deactivate WM
+LR <-- AS : Tuple[jti, refresh_jwt]
+deactivate AS
+LR -> AS : create_access_jwt(user, refresh_jti)
+activate AS
+AS -> AS : __generate_access_jwt(user, refresh_jti)
+activate AS
+deactivate AS
+AS -> AS : __encode_jwt(access_jwt)
+activate AS
+deactivate AS
+LR <-- AS : access_jwt
+deactivate AS
+FE <-- LR : HTTP Response: 200 OK {access_jwt, refresh_jwt}
 deactivate LR
 activate FE
-AppUser <-- FE : Login Success (redirect to dashboard)
+FE -> FE : store access_jwt and refresh_jwt in HTTP only cookie
+AppUser <-- FE : Success: Login
 deactivate FE
 @enduml
