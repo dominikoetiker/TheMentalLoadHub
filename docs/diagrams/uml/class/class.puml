@@ -362,14 +362,19 @@ package "Services Classes" {
     '--------------------------------
     Class AuthService {
         + create_access_jwt(user: User, refresh_jti: str): str
+        - __generate_access_jwt(user: User, refresh_jti: str): str
         + create_refresh_jwt(user: User, user_agent: str, ip_address: str): Tuple[str, str]
         - __generate_refresh_jwt(user: User): str
         - __encode_jwt(jwt: str): str
+        - __decode_jwt(jwt: str): str
         + verify_access_jwt(jwt: str): User
         + verify_password(user: User, plain_password: str): bool
         - __query_blacklisted_jwt(user_id, expires_at): List[BlacklistedJWT]
         - __is_jwt_blacklisted(jwt: str, List[BlacklistedJWT]
-        + blacklist_jwt(jwt: str, user_id: int, expires_at: datetime.datetime): None
+        + revoke_jwt(access_jwt: str, user_agent: str, ip_address: str)
+        - __blacklist_jwt(jwt: str, jti: str, expires_at: datetime.datetime): None
+        - __query_whitelisted_jwt_by_device_info(user_agent: str, ip_address: str): WhitelistedJWTRefreshToken
+        - __query_whitelisted_jwt_by_jti(jti: str): WhitelistedJWTRefreshToken
     }
     note bottom
         JWT Access Token Format:
