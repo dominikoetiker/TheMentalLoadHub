@@ -43,11 +43,12 @@ design is refined based on feedback and testing.
     - [ ] **Account management**
         - [x] Sign up (#23): [sign_up-0.svg](docs/diagrams/uml/sequence/sign_up-0.svg)
         - [x] Email verification (#23, 27): [email-verification-0.svg](docs/diagrams/uml/sequence/email-verification-0.svg)
-        - [x] Login (#25): [login-0.svg](docs/diagrams/uml/sequence/login-0.svg)
-        - [ ] Verify JWT:
-        - [ ] Refresh JWT:
-        - [ ] Revoke JWT:
-        - [ ] Logout (#26):
+        - [ ] Authentication process
+            - [x] Login (#25): [login-0.svg](docs/diagrams/uml/sequence/login-0.svg)
+            - [x] Revoke JWT: [revoke_jwt-0.svg](docs/diagrams/uml/sequence/revoke_jwt-0.svg)
+            - [ ] Refresh JWT:
+            - [ ] Verify JWT:
+            - [ ] Logout (#26):
         - [ ] Update account (#24, #27)
         - [ ] Reset password (#28)
         - [ ] Delete account
