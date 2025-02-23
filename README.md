@@ -47,7 +47,7 @@ design is refined based on feedback and testing.
             - [x] Create JWT: [create_jwt-0.svg](docs/diagrams/uml/sequence/create_jwt-0.svg)
             - [x] Revoke JWT: [revoke_jwt-0.svg](docs/diagrams/uml/sequence/revoke_jwt-0.svg)
             - [x] Refresh JWT: [refresh_jwt-0.svg](docs/diagrams/uml/sequence/refresh_jwt-0.svg)
-            - [ ] Verify JWT:
+            - [x] Verify JWT: [verify_jwt-0.svg](docs/diagrams/uml/sequence/verify_jwt-0.svg)
             - [x] Login (#25): [login-0.svg](docs/diagrams/uml/sequence/login-0.svg)
             - [ ] Logout (#26):
         - [ ] Update account (#24, #27)

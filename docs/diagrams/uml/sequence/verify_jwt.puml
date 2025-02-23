@@ -1,0 +1,50 @@
+@startuml
+participant "Frontend (React)" as FE
+participant "/[any] route\n(Flask Blueprint)" as AR
+participant "AuthService" as AS
+participant "UserService" as US
+
+== (Generic) Verify JWT ==
+activate AR
+AR -> AS : verify_access_jwt(encoded_access_jwt)
+activate AS
+AS -> AS : __decode_jwt(encoded_access_jwt)
+activate AS
+alt Decoding access JWT fails
+    AS <-- AS : None
+    AR <-- AS : None
+    note right of AR : Revoke JWT: see sep. generic diagram.
+end
+AS <-- AS : decoded_access_jwt
+deactivate AS
+AS -> AS : __query_blacklisted_jwt_by_jti(access_jti)
+activate AS
+alt access_jti is blacklisted
+    AS <-- AS : BlacklistedJWTAccessToken
+    AR <-- AS : None
+    note right of AR : Revoke JWT: see sep. generic diagram.
+end
+AS <-- AS : None
+deactivate AS
+AS -> AS : __has_jwt_expired(decoded_jwt: str)
+activate AS
+alt Access JWT has expired
+    AS <-- AS : True
+    AR <-- AS : raise JWTExpiredError("JWT has expired")
+    FE <-- AR : HTTP Response: 401 Unauthorized:\nJWT expired, redirects to refresh JWT
+    note right of FE : Refresh JWT: see sep. generic diagram
+end
+AS <-- AS : False
+deactivate AS
+AS -> US : query_users_by_id(decoded_access_jwt.sub)
+activate US
+alt User does not exist
+    AS <-- US : None
+    AR <-- AS : None
+    note right of AR : Revoke JWT: see sep. generic diagram.
+end
+AS <-- US : User object
+deactivate US
+AR <-- AS : User object
+deactivate AS
+@enduml
