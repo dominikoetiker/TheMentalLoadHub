@@ -369,7 +369,7 @@ package "Services Classes" {
         + verify_refresh_request(access_jwt, refresh_jwt): User
         - __decode_jwt(jwt: str): str
         - __has_jwt_expired(decoded_jwt: str): bool
-        - __is_jwt_blacklisted(jti): bool
+        - __query_blacklisted_jwt_by_jti(jti): BlacklistedJWTAccessToken
         - __does_jti_match(refresh_jti_from_access_jwt: str, refresh_jti_from_refresh_jwt: str): bool
         - __query_whitelisted_jwt_by_jti_user_agent(jti: str, user_agent: str): WhitelistedJWTRefreshToken
         + revoke_jwt(access_jwt: str, user_agent: str, ip_address: str)

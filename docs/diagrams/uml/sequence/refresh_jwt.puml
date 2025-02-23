@@ -31,14 +31,14 @@ alt access JWT has not expired
 end
 AS <-- AS : True
 deactivate AS
-AS -> AS : __is_jwt_blacklisted(access_jti)
+AS -> AS : __query_blacklisted_jwt_by_jti(access_jti)
 activate AS
 alt access_jti is blacklisted
-    AS <-- AS : True
+    AS <-- AS : BlacklistedJWTAccessToken
     RR <-- AS : None
     note right of RR : Revoke JWT: see sep. generic diagram.
 end
-AS <-- AS : False
+AS <-- AS : None
 deactivate AS
 AS -> AS : __decode_jwt(refresh_jwt)
 activate AS
