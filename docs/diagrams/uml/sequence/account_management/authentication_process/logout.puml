@@ -1,0 +1,18 @@
+@startuml
+actor "User" as AppUser
+participant "Frontend (React)" as FE
+participant "/logout route\n(Flask Blueprint)" as LR
+
+== Login Process (User Story #26) ==
+AppUser -> FE : Clicks logout button
+activate FE
+FE -> LR : HTTP Request: POST {access_jwt, [user_agent, ip_address]}
+deactivate FE
+activate LR
+note right of LR : Revoke JWT: see sep. generic diagram
+FE <-- LR : HTTP Response: 200 OK
+deactivate LR
+activate FE
+AppUser <-- FE : Success, redirects to login page
+deactivate FE
+@enduml

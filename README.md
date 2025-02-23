@@ -43,13 +43,13 @@ design is refined based on feedback and testing.
     - [ ] **Account management**
         - [x] Sign up (#23): [sign_up-0.svg](docs/diagrams/uml/sequence/account_management/sign_up-0.svg)
         - [x] Email verification (#23, 27): [email-verification-0.svg](docs/diagrams/uml/sequence/account_management/email-verification-0.svg)
-        - [ ] Authentication process
+        - [x] Authentication process
             - [x] Create JWT: [create_jwt-0.svg](docs/diagrams/uml/sequence/account_management/authentication_process/create_jwt-0.svg)
             - [x] Revoke JWT: [revoke_jwt-0.svg](docs/diagrams/uml/sequence/account_management/authentication_process/revoke_jwt-0.svg)
             - [x] Refresh JWT: [refresh_jwt-0.svg](docs/diagrams/uml/sequence/account_management/authentication_process/refresh_jwt-0.svg)
             - [x] Verify JWT: [verify_jwt-0.svg](docs/diagrams/uml/sequence/account_management/authentication_process/verify_jwt-0.svg)
             - [x] Login (#25): [login-0.svg](docs/diagrams/uml/sequence/account_management/authentication_process/login-0.svg)
-            - [ ] Logout (#26):
+            - [x] Logout (#26): [logout-0.svg](docs/diagrams/uml/sequence/account_management/authentication_process/logout-0.svg)
         - [ ] Update account (#24, #27)
         - [ ] Reset password (#28)
         - [ ] Delete account
