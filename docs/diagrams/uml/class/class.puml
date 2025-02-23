@@ -23,7 +23,7 @@ package "Model Classes" {
         + user_agent: str
         + ip_address: str
         + expires_at: datetime.datetime
-        + is_token_whitelisted(plain_jwt): bool
+        + verify_token(plain_jwt): bool
         - __hash_secret(secret: str): str
     }
 
@@ -361,19 +361,22 @@ package "Services Classes" {
     ' Services MVP only
     '--------------------------------
     Class AuthService {
+        + verify_password(user: User, plain_password: str): bool
         + create_jwt(user: User, user_agent: str, ip_address: str): Tuple[access_jwt: str, refresh_jwt: str]
         - __create_refresh_jwt(user: User): Tuple[refresh_jti: str, refresh_jwt: str]
         - __create_access_jwt(user: User, refresh_jti: str): str
         - __encode_jwt(jwt: str): str
+        + verify_refresh_request(access_jwt, refresh_jwt): User
         - __decode_jwt(jwt: str): str
-        + verify_access_jwt(jwt: str): User
-        + verify_password(user: User, plain_password: str): bool
-        - __query_blacklisted_jwt(user_id, expires_at): List[BlacklistedJWT]
-        - __is_jwt_blacklisted(jwt: str, List[BlacklistedJWT]
+        - __has_jwt_expired(decoded_jwt: str): bool
+        - __is_jwt_blacklisted(jti): bool
+        - __does_jti_match(refresh_jti_from_access_jwt: str, refresh_jti_from_refresh_jwt: str): bool
+        - __query_whitelisted_jwt_by_jti_user_agent(jti: str, user_agent: str): WhitelistedJWTRefreshToken
         + revoke_jwt(access_jwt: str, user_agent: str, ip_address: str)
         - __blacklist_jwt(jwt: str, jti: str, expires_at: datetime.datetime): None
         - __query_whitelisted_jwt_by_device_info(user_agent: str, ip_address: str): WhitelistedJWTRefreshToken
         - __query_whitelisted_jwt_by_jti(jti: str): WhitelistedJWTRefreshToken
+        + verify_access_jwt(jwt: str): User
     }
     note bottom
         JWT Access Token Format:
@@ -409,6 +412,7 @@ package "Services Classes" {
     Class UserService {
         + query_users_by_mail(email: str): User
         + query_users_by_unverified_mail_and_not_expired_verification(unverified_email: str): User
+        + query_users_by_id(user_id: int): User
         + create_user(unverified_email: str, plain_password: str, plain_verification_token: str): User
     }
 

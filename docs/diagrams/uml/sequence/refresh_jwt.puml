@@ -1,0 +1,111 @@
+@startuml
+participant "Frontend (React)" as FE
+participant "/refresh route\n(Flask Blueprint)" as RR
+participant "AuthService" as AS
+participant "UserService" as US
+participant "WhitelistedJWTRefreshToken Model\n(SQLAlchemy -> Database)" as WM
+
+== (Generic) Refresh JWT ==
+activate FE
+FE -> RR: HTTP Request: POST\n{expired access_jwt, encoded_refresh_jwt, user_agent, ip_address}
+deactivate FE
+activate RR
+RR -> AS : verify_refresh_request(access_jwt, encoded_refresh_jwt)
+activate AS
+AS -> AS : __decode_jwt(access_jwt)
+activate AS
+alt Decoding access JWT fails
+    AS <-- AS : None
+    RR <-- AS : None
+    note right of RR : Revoke JWT: see sep. generic diagram.
+end
+AS <-- AS : decoded_access_jwt
+deactivate AS
+AS -> AS : __has_jwt_expired(decoded_access_jwt)
+activate AS
+alt access JWT has not expired
+    AS <-- AS : False
+    note right of AS : Note: only expired access token authorize for new access token
+    RR <-- AS : None
+    note right of RR : Revoke JWT: see sep. generic diagram.
+end
+AS <-- AS : True
+deactivate AS
+AS -> AS : __is_jwt_blacklisted(access_jti)
+activate AS
+alt access_jti is blacklisted
+    AS <-- AS : True
+    RR <-- AS : None
+    note right of RR : Revoke JWT: see sep. generic diagram.
+end
+AS <-- AS : False
+deactivate AS
+AS -> AS : __decode_jwt(refresh_jwt)
+activate AS
+alt Decoding refresh JWT fails
+    AS <-- AS : None
+    RR <-- AS : None
+    note right of RR : Revoke JWT: see sep. generic diagram.
+end
+AS <-- AS : decoded_refresh_jwt
+deactivate AS
+AS -> AS : __does_jti_match(refresh_jti_from_access_jwt, refresh_jti_from_refresh_jwt)
+activate AS
+alt jti does not match
+    AS <-- AS : False
+    RR <-- AS : None
+    note right of RR : Revoke JWT: see sep. generic diagram.
+    end
+    AS <-- AS : True
+deactivate AS
+AS -> AS : __has_jwt_expired(decoded_refresh_jwt)
+activate AS
+alt refresh JWT has expired
+    AS <-- AS : True
+    RR <-- AS : None
+    note right of RR : Revoke JWT: see sep. generic diagram.
+end
+AS <-- AS : False
+deactivate AS
+AS -> AS : __query_whitelisted_jwt_by_jti_user_agent(jti, user_agent)
+activate AS
+alt Refresh JWT not on Whitelist
+    AS <-- AS : None
+    RR <-- AS : None
+    note right of RR : Revoke JWT: see sep. generic diagram.
+end
+AS <-- AS : whitelisted_jwt_refresh_token
+deactivate AS
+AS -> WM : verify_token(encoded_refresh_jwt)
+activate WM
+WM -> WM : __hash_secret(encoded_refresh_jwt)
+activate WM
+deactivate WM
+alt  refresh_token does not match
+    AS <-- WM : False
+    RR <-- AS : None
+    note right of RR : Revoke JWT: see sep. generic diagram.
+end
+AS <-- WM : True
+deactivate WM
+AS -> US : query_users_by_id(user_id)
+activate US
+alt User does not exist
+    AS <-- US : None
+    RR <-- AS : None
+    note right of RR : Revoke JWT: see sep. generic diagram.
+end
+AS <-- US : User object
+deactivate US
+AS -> WM : delete(whitelisted_jwt_refresh_token)
+activate WM
+deactivate WM
+RR <-- AS : User object
+deactivate AS
+note right of RR : Create JWT: see sep. generic diagram.
+FE <-- RR : HTTP Response: 200 OK\n{new_access_jwt, new_refresh_jwt}
+deactivate RR
+activate FE
+FE -> FE : store access_jwt and encoded_refresh_jwt in HTTP only cookie
+deactivate FE
+@enduml
