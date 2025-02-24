@@ -1,4 +1,4 @@
-@startuml
+@startuml UpdateAccountSequence
 actor "Account User" as AU
 participant "Frontend (React)" as FE
 participant "/update_account route\n(Flask Blueprint)" as UR

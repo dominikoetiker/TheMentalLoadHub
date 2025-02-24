@@ -1,4 +1,4 @@
-@startuml
+@startuml SignUpSequence
 actor "New User" as AppUser
 participant "Frontend (React)" as FE
 participant "/signup route\n (Flask Blueprint)" as SR

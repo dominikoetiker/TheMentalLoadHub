@@ -32,25 +32,25 @@ design is refined based on feedback and testing.
 
 ## Draft the app (Diagrams)
 
-- [x] ERD:
-- [x] Database Schema:
-- [x] Use Case Diagram:
+- [x] ERD: [TheMentalLoadHub_ERD.svg](docs/out/diagrams/erd/TheMentalLoadHub_ERD.svg)
+- [x] Database Schema: [database_schema.sql](docs/src/database/database_schema.sql)
+- [x] Use Case Diagram: [TheMentalLoadHubUseCases.svg](docs/out/diagrams/uml/use_case/TheMentalLoadHubUseCases.svg)
 - [ ] **Class Diagram for backend**
-  - [x] Model Classes:
-  - [x] Model Relations:
-  - [ ] Service Classes:
+  - [x] Model Classes: [BackendClasses-page1.svg](docs/out/diagrams/uml/class/BackendClasses-page1.svg)
+  - [x] Model Relations: [BackendClasses-page2.svg](docs/out/diagrams/uml/class/BackendClasses-page2.svg)
+  - [ ] Service Classes: [BackendClasses-page3.svg](docs/out/diagrams/uml/class/BackendClasses-page3.svg)
 - [ ] **Sequence Diagrams**
   - [ ] **Account management**
-    - [x] Sign up (#23):
-    - [x] Email verification (#23, 27):
-    - [x] Authentication process
-      - [x] Create JWT:
-      - [x] Revoke JWT:
-      - [x] Refresh JWT:
-      - [x] Verify JWT:
-      - [x] Login (#25):
-      - [x] Logout (#26):
-    - [ ] Update account (#24, #27)
+    - [x] Sign up (#23): [SignUpSequence.svg](docs/out/diagrams/uml/sequence/account_management/SignUpSequence.svg)
+    - [x] Email verification (#23, 27): [EmailVerificationSequence.svg](docs/out/diagrams/uml/sequence/account_management/EmailVerificationSequence.svg)
+    - [x] **Authentication process**
+      - [x] Create JWT: [CreateJWTSequence.svg](docs/out/diagrams/uml/sequence/account_management/authentication_process/CreateJWTSequence.svg)
+      - [x] Revoke JWT: [RevokeJWTSequence.svg](docs/out/diagrams/uml/sequence/account_management/authentication_process/RevokeJWTSequence.svg)
+      - [x] Refresh JWT: [RefreshJWTSequence.svg](docs/out/diagrams/uml/sequence/account_management/authentication_process/RefreshJWTSequence.svg)
+      - [x] Verify JWT: [VerifyJWTSequence.svg](docs/out/diagrams/uml/sequence/account_management/authentication_process/VerifyJWTSequence.svg)
+      - [x] Login (#25): [LoginSequence.svg](docs/out/diagrams/uml/sequence/account_management/authentication_process/LoginSequence.svg)
+      - [x] Logout (#26): [LogoutSequence.svg](docs/out/diagrams/uml/sequence/account_management/authentication_process/LogoutSequence.svg)
+    - [ ] Update account (#24, #27) [UpdateAccountSequence.svg](docs/out/diagrams/uml/sequence/account_management/UpdateAccountSequence.svg)
     - [ ] Reset password (#28)
     - [ ] Delete account
   - [ ] **Household management**

@@ -1,4 +1,4 @@
-@startuml
+@startuml VerifyJWTSequence
 participant "Frontend (React)" as FE
 participant "/[any] route\n(Flask Blueprint)" as AR
 participant "AuthService" as AS

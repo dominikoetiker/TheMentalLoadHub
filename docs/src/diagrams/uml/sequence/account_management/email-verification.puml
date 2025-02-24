@@ -1,4 +1,4 @@
-@startuml
+@startuml EmailVerificationSequence
 actor "User" as AppUser
 participant "Frontend (React)" as FE
 participant "/verify route\n (Flask Blueprint)" as VR

@@ -1,4 +1,4 @@
-@startuml
+@startuml RevokeJWTSequence
 actor "User" as AppUser
 participant "Frontend (React)" as FE
 participant "/[any] route\n(Flask Blueprint)" as AR

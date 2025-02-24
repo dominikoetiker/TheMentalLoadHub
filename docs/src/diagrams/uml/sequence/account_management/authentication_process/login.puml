@@ -1,4 +1,4 @@
-@startuml
+@startuml LoginSequence
 actor "User" as AppUser
 participant "Frontend (React)" as FE
 participant "/login route\n(Flask Blueprint)" as LR

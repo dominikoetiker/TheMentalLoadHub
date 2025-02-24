@@ -1,4 +1,4 @@
-@startuml
+@startuml CreateJWTSequence
 participant "/[any] route\n(Flask Blueprint)" as AR
 participant "AuthService" as AS
 participant "WhitelistedJWTRefreshToken\nModel Object\n(SQLAlchemy to Database)" as WM

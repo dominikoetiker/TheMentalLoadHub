@@ -1,4 +1,4 @@
-@startuml Logout
+@startuml LogoutSequence
 actor "User" as AppUser
 participant "Frontend (React)" as FE
 participant "/logout route\n(Flask Blueprint)" as LR

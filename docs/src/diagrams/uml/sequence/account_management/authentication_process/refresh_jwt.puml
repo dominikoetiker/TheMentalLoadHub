@@ -1,4 +1,4 @@
-@startuml
+@startuml RefreshJWTSequence
 participant "Frontend (React)" as FE
 participant "/refresh route\n(Flask Blueprint)" as RR
 participant "AuthService" as AS
