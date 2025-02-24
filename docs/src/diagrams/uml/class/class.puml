@@ -361,6 +361,7 @@ package "Services Classes" {
     ' Services MVP only
     '--------------------------------
     Class AuthService {
+        + does_password_fullfill_requirements(plain_password: str): bool
         + verify_password(user: User, plain_password: str): bool
         + create_jwt(user: User, user_agent: str, ip_address: str): Tuple[access_jwt: str, refresh_jwt: str]
         - __create_refresh_jwt(user: User): Tuple[refresh_jti: str, refresh_jwt: str]

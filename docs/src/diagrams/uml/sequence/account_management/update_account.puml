@@ -1,30 +1,41 @@
 @startuml UpdateAccountSequence
-actor "Account User" as AU
+actor "Account User" as User
 participant "Frontend (React)" as FE
-participant "/update_account route\n(Flask Blueprint)" as UR
+participant "/update_account route\n(Flask Blueprint)" as UPR
+participant "/user route\n(Flask Blueprint)" as USR
 participant "UserService" as US
+participant "AuthService" as AS
 participant "EmailVerificationService" as ES
 
 == Update Account Process ==
-AU -> FE: Navigates to update account form
-FE -> AU: Display form
-AU -> FE: Submits update with {new_email, new_password}
-FE -> UR: HTTP Request: PUT {user_id, new_email, new_password}
-activate UR
-UR -> US: update_user_account(user_id, new_email, new_password)
+User -> FE: Navigates to update account form
+activate FE
+FE -> USR: HTTP Request: GET {access_jwt}
+deactivate FE
+activate USR
+note right of USR: Verify JWT: see sep. generic diagram.
+USR -> US: query_users_by_id(decoded_access_jwt.sub)
 activate US
-alt Email is updated
-    US -> ES: create_verification_token()
-    activate ES
-    ES -> ES: __create_verification_link(new_verification_token, new_email)
-    deactivate ES
-    US <- ES: verification_link
-    US -> US: update user record (set unverified_email, verification_token, verification_exp_at)
-    US -> ES: send_verification_mail(verification_link, new_email)
-end
-US --> UR: Updated User Object
+USR <-- US: User object
 deactivate US
-UR --> FE: HTTP Response: 200 OK {updated_user_info}
-deactivate UR
-FE -> AU: Show success message and instructions (check email if updated)
+FE <-- USR: HTTP Response: 200 OK {email}
+deactivate USR
+activate FE
+User <-- FE: Update account form\nwith prefilled email and\nempty password fields\n(1 x old, 2 x new)
+deactivate FE
+User -> FE: Submits update account form
+activate FE
+FE -> FE: verify_passwords_match(plain_new_password, plain_new_password_confirm)
+activate FE
+alt Passwords do not match
+    FE <-- FE : False
+    User <-- FE : Error: Passwords do not match, try again
+end
+FE <-- FE : True
+deactivate FE
+FE -> UPR: HTTP Request: POST {access_jwt, email, old_password, new_password}
+deactivate FE
+activate UPR
+note right of UPR: Verify JWT: see sep. generic diagram.
+
 @enduml

@@ -4,6 +4,7 @@ participant "Frontend (React)" as FE
 participant "/signup route\n (Flask Blueprint)" as SR
 participant "UserService" as US
 participant "EmailVerificationService" as ES
+participant "AuthService" as AS
 participant "User Model Object \n (SQLAlchemy\n to Database)" as UM
 participant "External \n Email Service" as Mail
 
@@ -11,7 +12,17 @@ participant "External \n Email Service" as Mail
 AppUser -> FE : Navigates to sign up form
 activate FE
 AppUser <-- FE : Sign up form
-AppUser -> FE : Fills sign up form {email, plain_password} and submits
+deactivate FE
+AppUser -> FE : Fills sign up form\n{email, plain_password, plain_password_confirm} and submits
+activate FE
+FE -> FE : verify_passwords_match(plain_password, plain_password_confirm)
+activate FE
+alt Passwords do not match
+    FE <-- FE : False
+    AppUser <-- FE : Error: Passwords do not match, try again
+end
+FE <-- FE : True
+deactivate FE
 FE -> SR : HTTP Request: POST {email, plain_password}
 deactivate FE
 activate SR
@@ -36,6 +47,17 @@ alt Account already exists
     deactivate FE
 end
 SR <-- US : None
+SR -> AS : does_password_fullfill_requirements(plain_password)
+activate AS
+alt Password does not fulfill requirements
+    SR <-- AS : False
+    FE <-- SR : HTTP Response: 400 Bad Request (Password requirements not met)
+    activate FE
+    AppUser <-- FE : Error: Password requirements not met, try again
+    deactivate FE
+end
+SR <-- AS : True
+deactivate AS
 deactivate US
 SR -> ES : create_verification_token()
 activate ES
