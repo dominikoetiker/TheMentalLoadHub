@@ -21,6 +21,15 @@ alt Decoding access JWT fails
 end
 AS <-- AS : decoded_access_jwt
 deactivate AS
+AS -> AS : __is_access_jwt(decoded_access_jwt)
+activate AS
+alt Token is not an access JWT
+    AS <-- AS : False
+    RR <-- AS : None
+    note right of RR : Revoke JWT: see sep. generic diagram.
+end
+AS <-- AS : True
+deactivate AS
 AS -> AS : __has_jwt_expired(decoded_access_jwt)
 activate AS
 alt access JWT has not expired
@@ -48,6 +57,15 @@ alt Decoding refresh JWT fails
     note right of RR : Revoke JWT: see sep. generic diagram.
 end
 AS <-- AS : decoded_refresh_jwt
+deactivate AS
+AS -> AS : __is_refresh_jwt(decoded_refresh_jwt)
+activate AS
+alt Token is not a refresh JWT
+    AS <-- AS : False
+    RR <-- AS : None
+    note right of RR : Revoke JWT: see sep. generic diagram.
+end
+AS <-- AS : True
 deactivate AS
 AS -> AS : __does_jti_match(refresh_jti_from_access_jwt, refresh_jti_from_refresh_jwt)
 activate AS

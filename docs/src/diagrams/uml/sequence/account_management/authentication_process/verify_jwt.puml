@@ -17,6 +17,15 @@ alt Decoding access JWT fails
 end
 AS <-- AS : decoded_access_jwt
 deactivate AS
+AS -> AS : __is_access_jwt(decoded_access_jwt)
+activate AS
+alt Token is not an access JWT
+    AS <-- AS : False
+    AR <-- AS : None
+    note right of AR : Revoke JWT: see sep. generic diagram.
+end
+AS <-- AS : True
+deactivate AS
 AS -> AS : __query_blacklisted_jwt_by_jti(access_jti)
 activate AS
 alt access_jti is blacklisted

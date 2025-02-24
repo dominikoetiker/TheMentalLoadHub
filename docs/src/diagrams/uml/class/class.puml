@@ -49,6 +49,8 @@ package "Model Classes" {
         - __hashed_verification_token: str
         + is_user_verified: bool
         + verification_exp_at: datetime.datetime
+        - __hashed_reset_password_jwt: str
+        + was_reset_jwt_used: bool
         + created_at: datetime.datetime
         + updated_at: datetime.datetime
         + is_deleted: bool
@@ -59,6 +61,8 @@ package "Model Classes" {
         + update_email(new_email: str, plain_verification_token: str): None
         + update_verification_token(plain_verification_token: str): None
         + verify_verification_token(plain_verification_token: str): bool
+        + update_reset_password_jwt(new_plain_reset_password_jwt: str): None
+        + verify_reset_password_jwt(plain_reset_password_jwt: str): bool
     }
 
     Enum HouseholdRole {
@@ -370,6 +374,7 @@ package "Services Classes" {
         - __encode_jwt(jwt: str): str
         + verify_refresh_request(access_jwt, refresh_jwt): User
         - __decode_jwt(jwt: str): str
+        - __is_refresh_jwt(decoded_jwt: str): bool
         - __has_jwt_expired(decoded_jwt: str): bool
         - __query_blacklisted_jwt_by_jti(jti): BlacklistedJWTAccessToken
         - __does_jti_match(refresh_jti_from_access_jwt: str, refresh_jti_from_refresh_jwt: str): bool
@@ -379,6 +384,10 @@ package "Services Classes" {
         - __query_whitelisted_jwt_by_device_info(user_agent: str, ip_address: str): WhitelistedJWTRefreshToken
         - __query_whitelisted_jwt_by_jti(jti: str): WhitelistedJWTRefreshToken
         + verify_access_jwt(jwt: str): User
+        - __is_access_jwt(decoded_jwt: str): bool
+        + create_reset_password_jwt(user: User): str
+        - send_reset_password_email(email: str, encoded_reset_password_jwt: str): None
+        + __create_reset_password_link(reset_password_jwt: str): str
     }
     note bottom
         JWT Access Token Format:
@@ -389,6 +398,9 @@ package "Services Classes" {
             Payload.iss: thementalloadhub
             Payload.iat: issued_at (datetime.datetime)
             Payload.sub: user_id (int)
+            Payload.access: true
+            Payload.refresh: false
+            Payload.pwreset: false
             Payload.exp: expiration_time (datetime.datetime {now + 5 minutes})
             Signature: HS256
 
@@ -399,7 +411,23 @@ package "Services Classes" {
             Payload.iss: thementalloadhub
             Payload.iat: issued_at (datetime.datetime)
             Payload.sub: user_id (int)
+            Payload.access: false
+            Payload.refresh: true
+            Payload.pwreset: false
             Payload.exp: expiration_time (datetime.datetime {now + 31 days})
+            Signature: HS256
+
+        JWT Reset Password Token Format:
+            Header.alg: HS256
+            Header.typ: JWT
+            Payload.jti: uuid (str)
+            Payload.iss: thementalloadhub
+            Payload.iat: issued_at (datetime.datetime)
+            Payload.sub: user_id (int)
+            Payload.access: false
+            Payload.refresh: false
+            Payload.pwreset: true
+            Payload.exp: expiration_time (datetime.datetime {now + 1 hour})
             Signature: HS256
     end note
 
