@@ -32,41 +32,37 @@ design is refined based on feedback and testing.
 
 ## Draft the app (Diagrams)
 
-- [x] ERD: [TheMentalLoadHub_ERD.svg](docs/diagrams/erd/TheMentalLoadHub_ERD.png)
-- [x] Database Schema: [database_schema.sql](docs/database/database_schema.sql)
-- [x] Use Case Diagram: [use_case.svg](docs/diagrams/uml/use_case/use_case.svg)
+- [x] ERD:
+- [x] Database Schema:
+- [x] Use Case Diagram:
 - [ ] **Class Diagram for backend**
-    - [x] Model Classes: [class-0.svg](docs/diagrams/uml/class/class-0.svg)
-    - [x] Model Relations: [class-1.svg](docs/diagrams/uml/class/class-1.svg)
-    - [ ] Service Classes: [class-2.svg](docs/diagrams/uml/class/class-2.svg)
+  - [x] Model Classes:
+  - [x] Model Relations:
+  - [ ] Service Classes:
 - [ ] **Sequence Diagrams**
-    - [ ] **Account management**
-        - [x] Sign up (#23): [sign_up-0.svg](docs/diagrams/uml/sequence/account_management/sign_up-0.svg)
-        - [x] Email verification (#23, 27): [email-verification-0.svg](docs/diagrams/uml/sequence/account_management/email-verification-0.svg)
-        - [x] Authentication process
-            - [x] Create JWT: [create_jwt-0.svg](docs/diagrams/uml/sequence/account_management/authentication_process/create_jwt-0.svg)
-            - [x] Revoke JWT: [revoke_jwt-0.svg](docs/diagrams/uml/sequence/account_management/authentication_process/revoke_jwt-0.svg)
-            - [x] Refresh JWT: [refresh_jwt-0.svg](docs/diagrams/uml/sequence/account_management/authentication_process/refresh_jwt-0.svg)
-            - [x] Verify JWT: [verify_jwt-0.svg](docs/diagrams/uml/sequence/account_management/authentication_process/verify_jwt-0.svg)
-            - [x] Login (#25): [login-0.svg](docs/diagrams/uml/sequence/account_management/authentication_process/login-0.svg)
-            - [x] Logout (#26): [logout-0.svg](docs/diagrams/uml/sequence/account_management/authentication_process/logout-0.svg)
-        - [ ] Update account (#24, #27)
-        - [ ] Reset password (#28)
-        - [ ] Delete account
-    - [ ] **Household management**
-        - [ ] Create household (#12, #13)
-        - [ ] Update household (#16)
-        - [ ] Delete household (#15)
-        - [ ] Add member (#18)
-        - [ ] Remove member (#19)
-        - [ ] Assign admin role (#20)
-        - [ ] Remove admin role
-        - [ ] View household members (#30)
-    - [ ] **Task management**
-        -[ ] Create recurring task (#34, #35, #38, #39)
-        -[ ] Create non recurring task (#34, #35, #41)
-        -[ ] Update recurring task (#38, #39, #40, #45, #46, #47)
-        -[ ] Update non recurring task (#41, #45, #47)
+  - [ ] **Account management**
+    - [x] Sign up (#23):
+    - [x] Email verification (#23, 27):
+    - [x] Authentication process
+      - [x] Create JWT:
+      - [x] Revoke JWT:
+      - [x] Refresh JWT:
+      - [x] Verify JWT:
+      - [x] Login (#25):
+      - [x] Logout (#26):
+    - [ ] Update account (#24, #27)
+    - [ ] Reset password (#28)
+    - [ ] Delete account
+  - [ ] **Household management**
+    - [ ] Create household (#12, #13)
+    - [ ] Update household (#16)
+    - [ ] Delete household (#15)
+    - [ ] Add member (#18)
+    - [ ] Remove member (#19)
+    - [ ] Assign admin role (#20)
+    - [ ] Remove admin role
+    - [ ] View household members (#30)
+  - [ ] **Task management** -[ ] Create recurring task (#34, #35, #38, #39) -[ ] Create non recurring task (#34, #35, #41) -[ ] Update recurring task (#38, #39, #40, #45, #46, #47) -[ ] Update non recurring task (#41, #45, #47)
 
 ## License
 
