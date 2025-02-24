@@ -6,6 +6,8 @@ participant "/user route\n(Flask Blueprint)" as USR
 participant "UserService" as US
 participant "AuthService" as AS
 participant "EmailVerificationService" as ES
+participant "User Model Object\n(SQLAlchemy to Database)" as UM
+participant "External \n Email Service" as Mail
 
 == Update Account Process ==
 User -> FE: Navigates to update account form
@@ -33,9 +35,108 @@ alt Passwords do not match
 end
 FE <-- FE : True
 deactivate FE
-FE -> UPR: HTTP Request: POST {access_jwt, email, old_password, new_password}
+FE -> UPR: HTTP Request: POST {access_jwt, new_email, plain_old_password, plain_new_password}
 deactivate FE
 activate UPR
 note right of UPR: Verify JWT: see sep. generic diagram.
-
+alt New email was provided
+    UPR -> ES : is_email_format_valid(new_email)
+    activate ES
+    alt Email format not valid
+        UPR <-- ES : False
+        FE <-- UPR : HTTP Response: 400 Bad Request (Email format not valid)
+        activate FE
+        User <-- FE : Error: Email format not valid, try again
+        deactivate FE
+    end
+    UPR <-- ES : True
+    deactivate ES
+end
+alt New password was provided
+    UPR -> AS : does_password_fulfill_requirements(plain_new_password)
+    activate AS
+    alt Password does not fulfill requirements
+        UPR <-- AS : False
+        FE <-- UPR : HTTP Response: 400 Bad Request (Password requirements not met)
+        activate FE
+        User <-- FE : Error: Password requirements not met, try again
+        deactivate FE
+    end
+    UPR <-- AS : True
+    deactivate AS
+    UPR -> US : query_users_by_id(decoded_access_jwt.sub)
+    activate US
+    UPR <-- US : User object
+    deactivate US
+    UPR -> AS : verify_password(User, plain_old_password)
+    activate AS
+    AS -> UM : verify_password(plain_old_password)
+    activate UM
+    UM -> UM : __hash_secret(plain_old_password)
+    activate UM
+    deactivate UM
+    alt Password does not match
+        AS <-- UM : False
+        UPR <-- AS : False
+        FE <-- UPR : HTTP Response: 401 Unauthorized
+        activate FE
+        User <-- FE : Error: Password incorrect, try again
+        deactivate FE
+    end
+    AS <-- UM : True
+    deactivate UM
+    UPR <-- AS : True
+    deactivate AS
+end
+alt New email was provided
+    UPR -> ES : create_verification_token()
+    activate ES
+    UPR <-- ES : plain_verification_token
+    deactivate ES
+    UPR -> US : query_users_by_id(decoded_access_jwt.sub)
+    activate US
+    UPR <-- US : User object
+    deactivate US
+    UPR -> US : update_user_email(User, new_email, plain_verification_token)
+    activate US
+    US -> UM : update_email(new_email, plain_verification_token)
+    activate UM
+    UM -> UM : unverified_email = new_email
+    activate UM
+    deactivate UM
+    UM -> UM : __hash_secret(plain_verification_token)
+    activate UM
+    deactivate UM
+    UM -> UM : verification_exp_at = (now + 48h)
+    activate UM
+    deactivate UM
+    deactivate UM
+    deactivate US
+    UPR -> ES : send_verification_mail(verification_token, unverified_email)
+    activate ES
+    ES -> ES : __create_verification_link(plain_verification_token, unverified_email)
+    activate ES
+    deactivate ES
+    ES -> Mail : send email {verification_link, email}
+    activate Mail
+    deactivate ES
+    User <- Mail : Mail with link
+    deactivate Mail
+end
+alt New password was provided
+    UPR -> US : update_user_password(User, plain_new_password)
+    activate US
+    US -> UM : update_password(plain_new_password)
+    activate UM
+    UM -> UM : __hash_secret(plain_new_password)
+    activate UM
+    deactivate UM
+    deactivate UM
+    deactivate US
+end
+FE <-- UPR: HTTP Response: 200 OK
+deactivate UPR
+activate FE
+User <-- FE: Success Message
+deactivate FE
 @enduml

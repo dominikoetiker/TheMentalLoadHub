@@ -50,7 +50,7 @@ design is refined based on feedback and testing.
       - [x] Verify JWT: [VerifyJWTSequence.svg](docs/out/diagrams/uml/sequence/account_management/authentication_process/VerifyJWTSequence.svg)
       - [x] Login (#25): [LoginSequence.svg](docs/out/diagrams/uml/sequence/account_management/authentication_process/LoginSequence.svg)
       - [x] Logout (#26): [LogoutSequence.svg](docs/out/diagrams/uml/sequence/account_management/authentication_process/LogoutSequence.svg)
-    - [ ] Update account (#24, #27) [UpdateAccountSequence.svg](docs/out/diagrams/uml/sequence/account_management/UpdateAccountSequence.svg)
+    - [x] Update account (#24, #27) [UpdateAccountSequence.svg](docs/out/diagrams/uml/sequence/account_management/UpdateAccountSequence.svg)
     - [ ] Reset password (#28)
     - [ ] Delete account
   - [ ] **Household management**

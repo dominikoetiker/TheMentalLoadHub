@@ -56,6 +56,7 @@ package "Model Classes" {
         - __hash_secret(secret: str): str
         + update_password(new_plain_password: str): None
         + verify_password(plain_password: str): bool
+        + update_email(new_email: str, plain_verification_token: str): None
         + update_verification_token(plain_verification_token: str): None
         + verify_verification_token(plain_verification_token: str): bool
     }
@@ -361,7 +362,7 @@ package "Services Classes" {
     ' Services MVP only
     '--------------------------------
     Class AuthService {
-        + does_password_fullfill_requirements(plain_password: str): bool
+        + does_password_fulfill_requirements(plain_password: str): bool
         + verify_password(user: User, plain_password: str): bool
         + create_jwt(user: User, user_agent: str, ip_address: str): Tuple[access_jwt: str, refresh_jwt: str]
         - __create_refresh_jwt(user: User): Tuple[refresh_jti: str, refresh_jwt: str]
@@ -415,6 +416,8 @@ package "Services Classes" {
         + query_users_by_unverified_mail_and_not_expired_verification(unverified_email: str): User
         + query_users_by_id(user_id: int): User
         + create_user(unverified_email: str, plain_password: str, plain_verification_token: str): User
+        + update_user_email(user: User, new_email: str, plain_verification_token: str): None
+        + update_user_password(user: User, new_plain_password: str): None
     }
 
     Class HouseholdService {

@@ -47,7 +47,8 @@ alt Account already exists
     deactivate FE
 end
 SR <-- US : None
-SR -> AS : does_password_fullfill_requirements(plain_password)
+deactivate US
+SR -> AS : does_password_fulfill_requirements(plain_password)
 activate AS
 alt Password does not fulfill requirements
     SR <-- AS : False
@@ -58,7 +59,6 @@ alt Password does not fulfill requirements
 end
 SR <-- AS : True
 deactivate AS
-deactivate US
 SR -> ES : create_verification_token()
 activate ES
 SR <-- ES : verification_token
