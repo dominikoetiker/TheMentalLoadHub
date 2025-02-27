@@ -59,7 +59,7 @@ design is refined based on feedback and testing.
     - [x] Reset password confirm (#28): [ResetPasswordConfirmSequence.svg](docs/out/diagrams/uml/sequence/account_management/ResetPasswordConfirmSequence.svg)
     - [x] Delete account: [DeleteAccountSequence.svg](docs/out/diagrams/uml/sequence/account_management/DeleteAccountSequence.svg)
   - [ ] **Household management**
-    - [ ] Create household (#12, #13):
+    - [x] Create household (#12, #13): [CreateHouseholdSequence.svg](docs/out/diagrams/uml/sequence/household/CreateHouseholdSequence.svg)
     - [ ] Update household (#16):
     - [ ] Delete household (#15):
     - [ ] Add member (#18):

@@ -1,0 +1,38 @@
+@startuml CreateHouseholdSequence
+actor "User" as User
+participant "Frontend (React)" as FE
+participant "/household route (Flask Blueprint)" as HR
+participant "HouseholdService" as HS
+participant "Household Model Object \n (SQLAlchemy\n to Database)" as HM
+participant "Household_User Model Object \n (SQLAlchemy\n to Database)" as HUM
+
+== Create Household (User stories #12, #13) ==
+User -> FE: Navigates to create household form
+activate FE
+User <-- FE: Show form for new household name
+deactivate FE
+User -> FE: Submits form {household_name}
+activate FE
+FE -> HR: HTTP POST: {household_name, access_jwt}
+deactivate FE
+activate HR
+note right of HR: Verify JWT: see generic process
+HR -> HS: create_household(household_name, user)
+activate HS
+HS -> HM: new(household_name)
+activate HM
+HS <-- HM: Household object
+deactivate HM
+HS -> HUM: new(household, user, 1, is_accepted=True)
+note right of HUM: 1 is the user's role\n(1=administrator)\nin the household
+activate HUM
+HS <-- HUM: Household_User object
+deactivate HUM
+HR <-- HS: Household object
+deactivate HS
+HR --> FE: HTTP 201 Created {household_name, [[user_email, role], ...]}
+deactivate HR
+activate FE
+User <-- FE: Household creation success, redirects to household page
+deactivate FE
+@enduml

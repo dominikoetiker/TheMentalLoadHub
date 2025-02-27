@@ -451,11 +451,8 @@ package "Services Classes" {
     }
 
     Class HouseholdService {
-        ' US #12 #13
         + create_household(name: str, creator: User): Household
-        ' US #15
         + query_household_list_by_household_admin(household_admin: User): List[Household]
-        ' US #13
         + assign_household_role(user: User, role: HouseholdRole): None
     }
 
