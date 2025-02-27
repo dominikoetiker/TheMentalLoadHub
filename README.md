@@ -34,7 +34,7 @@ design is refined based on feedback and testing.
   - Components library: Mantine UI
 - **Mobile:** React Native
 
-## Draft the app (Diagrams)
+## Draft the app (Diagrams, Schemas, Wireframes, etc)
 
 - [x] ERD: [TheMentalLoadHub_ERD.svg](docs/out/diagrams/erd/TheMentalLoadHub_ERD.svg)
 - [x] Database Schema: [database_schema.sql](docs/src/database/database_schema.sql)
