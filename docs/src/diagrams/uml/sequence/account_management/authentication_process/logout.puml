@@ -1,18 +1,18 @@
 @startuml LogoutSequence
-actor "User" as AppUser
+actor "User" as User
 participant "Frontend (React)" as FE
-participant "/logout route\n(Flask Blueprint)" as LR
+participant "/api/v1/auth/logout route\n(Flask Blueprint)" as ALoR
 
-== Login Process (User Story #26) ==
-AppUser -> FE : Clicks logout button
+== Logout Process (User Story #26) ==
+User -> FE : Clicks logout button
 activate FE
-FE -> LR : HTTP Request: POST {access_jwt, [user_agent, ip_address]}
+FE -> ALoR : HTTP Request: POST {access_jwt, [user_agent, ip_address]}
 deactivate FE
-activate LR
-note right of LR : Revoke JWT: see sep. generic diagram
-FE <-- LR : HTTP Response: 200 OK
-deactivate LR
+activate ALoR
+note right of ALoR : Revoke JWT: see sep. generic diagram
+FE <-- ALoR : HTTP Response: 200 OK
+deactivate ALoR
 activate FE
-AppUser <-- FE : Success, redirects to login page
+User <-- FE : Success, redirects to login page
 deactivate FE
 @enduml

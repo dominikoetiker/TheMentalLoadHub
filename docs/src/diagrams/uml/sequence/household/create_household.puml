@@ -1,7 +1,7 @@
 @startuml CreateHouseholdSequence
 actor "User" as User
 participant "Frontend (React)" as FE
-participant "/household route (Flask Blueprint)" as HR
+participant "/api/v1/households route (Flask Blueprint)" as HR
 participant "HouseholdService" as HS
 participant "Household Model Object \n (SQLAlchemy\n to Database)" as HM
 participant "Household_User Model Object \n (SQLAlchemy\n to Database)" as HUM

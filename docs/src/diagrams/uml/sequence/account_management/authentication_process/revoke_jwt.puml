@@ -1,14 +1,14 @@
 @startuml RevokeJWTSequence
-actor "User" as AppUser
+actor "User" as User
 participant "Frontend (React)" as FE
-participant "/[any] route\n(Flask Blueprint)" as AR
+participant "/[any] route\n(Flask Blueprint)" as R
 participant "AuthService" as AS
 participant "BlacklistedJWTAccessToken Model\n(SQLAlchemy -> Database)" as BM
 participant "WhitelistedJWTRefreshToken Model\n(SQLAlchemy -> Database)" as WM
 
 == (Generic) Revoke JWT ==
-activate AR
-AR -> AS : revoke_jwt(access_jwt, user_agent, ip_address)
+activate R
+R -> AS : revoke_jwt(access_jwt, user_agent, ip_address)
 activate AS
 AS -> AS : __decode_jwt(access_jwt)
 activate AS
@@ -18,9 +18,9 @@ alt Decoding access JWT fails
     activate AS
     alt No refresh token found
         AS <-- AS : None
-        FE <-- AR : HTTP Response: 404 Not Found / or in case of logout: 200 OK
+        FE <-- R : HTTP Response: 404 Not Found / or in case of logout: 200 OK
         activate FE
-        AppUser <-- FE : Redirects to login
+        User <-- FE : Redirects to login
         deactivate FE
     end
     AS <-- AS : WhitelistedJWTRefreshToken
@@ -41,9 +41,9 @@ else Decoding access JWT success
     activate AS
     alt No refresh token found
         AS <-- AS : None
-        FE <-- AR : HTTP Response: 404 Not Found / or in case of logout: 200 OK
+        FE <-- R : HTTP Response: 404 Not Found / or in case of logout: 200 OK
         activate FE
-        AppUser <-- FE : Redirects to login
+        User <-- FE : Redirects to login
         deactivate FE
     end
     AS <-- AS : WhitelistedJWTRefreshToken
@@ -53,10 +53,10 @@ AS -> WM : delete(WhitelistedJWTRefreshToken)
 activate WM
 deactivate WM
 deactivate AS
-FE <-- AR : HTTP Response: 404 Not Found / or in case of logout: 200 OK
-deactivate AR
+FE <-- R : HTTP Response: 404 Not Found / or in case of logout: 200 OK
+deactivate R
 activate FE
-AppUser <-- FE : Redirects to login
+User <-- FE : Redirects to login
 deactivate FE
 
 @enduml

@@ -1,8 +1,7 @@
 @startuml UpdateAccountSequence
-actor "Account User" as User
+actor "User" as User
 participant "Frontend (React)" as FE
-participant "/update_account route\n(Flask Blueprint)" as UPR
-participant "/user route\n(Flask Blueprint)" as USR
+participant "/api/v1/accounts route\n(Flask Blueprint)" as AR
 participant "UserService" as US
 participant "AuthService" as AS
 participant "EmailVerificationService" as ES
@@ -12,16 +11,16 @@ participant "External \n Email Service" as Mail
 == Update Account Process ==
 User -> FE: Navigates to update account form
 activate FE
-FE -> USR: HTTP Request: GET {access_jwt}
+FE -> AR: HTTP Request: GET {access_jwt}
 deactivate FE
-activate USR
-note right of USR: Verify JWT: see sep. generic diagram.
-USR -> US: query_users_by_id(decoded_access_jwt.sub)
+activate AR
+note right of AR: Verify JWT: see sep. generic diagram.
+AR -> US: query_users_by_id(decoded_access_jwt.sub)
 activate US
-USR <-- US: User object
+AR <-- US: User object
 deactivate US
-FE <-- USR: HTTP Response: 200 OK {email}
-deactivate USR
+FE <-- AR: HTTP Response: 200 OK {email}
+deactivate AR
 activate FE
 User <-- FE: Update account form\nwith prefilled email and\nempty password fields\n(1 x old, 2 x new)
 deactivate FE
@@ -35,40 +34,40 @@ alt Passwords do not match
 end
 FE <-- FE : True
 deactivate FE
-FE -> UPR: HTTP Request: POST {access_jwt, new_email, plain_old_password, plain_new_password}
+FE -> AR: HTTP Request: PATCH {access_jwt, new_email, plain_old_password, plain_new_password}
 deactivate FE
-activate UPR
-note right of UPR: Verify JWT: see sep. generic diagram.
+activate AR
+note right of AR: Verify JWT: see sep. generic diagram.
 alt New email was provided
-    UPR -> ES : is_email_format_valid(new_email)
+    AR -> ES : is_email_format_valid(new_email)
     activate ES
     alt Email format not valid
-        UPR <-- ES : False
-        FE <-- UPR : HTTP Response: 400 Bad Request (Email format not valid)
+        AR <-- ES : False
+        FE <-- AR : HTTP Response: 400 Bad Request (Email format not valid)
         activate FE
         User <-- FE : Error: Email format not valid, try again
         deactivate FE
     end
-    UPR <-- ES : True
+    AR <-- ES : True
     deactivate ES
 end
 alt New password was provided
-    UPR -> AS : does_password_fulfill_requirements(plain_new_password)
+    AR -> AS : does_password_fulfill_requirements(plain_new_password)
     activate AS
     alt Password does not fulfill requirements
-        UPR <-- AS : False
-        FE <-- UPR : HTTP Response: 400 Bad Request (Password requirements not met)
+        AR <-- AS : False
+        FE <-- AR : HTTP Response: 400 Bad Request (Password requirements not met)
         activate FE
         User <-- FE : Error: Password requirements not met, try again
         deactivate FE
     end
-    UPR <-- AS : True
+    AR <-- AS : True
     deactivate AS
-    UPR -> US : query_users_by_id(decoded_access_jwt.sub)
+    AR -> US : query_users_by_id(decoded_access_jwt.sub)
     activate US
-    UPR <-- US : User object
+    AR <-- US : User object
     deactivate US
-    UPR -> AS : verify_password(User, plain_old_password)
+    AR -> AS : verify_password(User, plain_old_password)
     activate AS
     AS -> UM : verify_password(plain_old_password)
     activate UM
@@ -77,27 +76,27 @@ alt New password was provided
     deactivate UM
     alt Password does not match
         AS <-- UM : False
-        UPR <-- AS : False
-        FE <-- UPR : HTTP Response: 401 Unauthorized
+        AR <-- AS : False
+        FE <-- AR : HTTP Response: 401 Unauthorized
         activate FE
         User <-- FE : Error: Password incorrect, try again
         deactivate FE
     end
     AS <-- UM : True
     deactivate UM
-    UPR <-- AS : True
+    AR <-- AS : True
     deactivate AS
 end
 alt New email was provided
-    UPR -> ES : create_verification_token()
+    AR -> ES : create_verification_token()
     activate ES
-    UPR <-- ES : plain_verification_token
+    AR <-- ES : plain_verification_token
     deactivate ES
-    UPR -> US : query_users_by_id(decoded_access_jwt.sub)
+    AR -> US : query_users_by_id(decoded_access_jwt.sub)
     activate US
-    UPR <-- US : User object
+    AR <-- US : User object
     deactivate US
-    UPR -> US : update_user_email(User, new_email, plain_verification_token)
+    AR -> US : update_user_email(User, new_email, plain_verification_token)
     activate US
     US -> UM : update_email(new_email, plain_verification_token)
     activate UM
@@ -112,7 +111,7 @@ alt New email was provided
     deactivate UM
     deactivate UM
     deactivate US
-    UPR -> ES : send_verification_mail(verification_token, unverified_email)
+    AR -> ES : send_verification_mail(verification_token, unverified_email)
     activate ES
     ES -> ES : __create_verification_link(plain_verification_token, unverified_email)
     activate ES
@@ -124,7 +123,7 @@ alt New email was provided
     deactivate Mail
 end
 alt New password was provided
-    UPR -> US : update_user_password(User, plain_new_password)
+    AR -> US : update_user_password(User, plain_new_password)
     activate US
     US -> UM : update_password(plain_new_password)
     activate UM
@@ -134,8 +133,8 @@ alt New password was provided
     deactivate UM
     deactivate US
 end
-FE <-- UPR: HTTP Response: 200 OK
-deactivate UPR
+FE <-- AR: HTTP Response: 200 OK
+deactivate AR
 activate FE
 User <-- FE: Success Message
 deactivate FE

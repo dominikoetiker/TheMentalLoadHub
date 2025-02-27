@@ -73,6 +73,25 @@ design is refined based on feedback and testing.
     - [ ] Update recurring task (#38, #39, #40, #45, #46, #47):
     - [ ] Update non recurring task (#41, #45, #47):
 
+## Routes
+
+**Authentication**
+
+- /api/v1/auth/sign-up (POST)
+- /api/v1/auth/verify (GET)
+- /api/v1/auth/refresh (POST)
+- /api/v1/auth/reset (POST/PUT)
+- /api/v1/auth/login (POST)
+- /api/v1/auth/logout (POST)
+
+**Accounts**
+
+- /api/v1/accounts (GET/PATCH/DELETE)
+
+**Households**
+
+- /api/v1/households (POST)
+
 ## License
 
 This project is licensed under the MIT License.

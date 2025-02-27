@@ -1,7 +1,7 @@
 @startuml SignUpSequence
-actor "New User" as AppUser
+actor "User" as User
 participant "Frontend (React)" as FE
-participant "/signup route\n (Flask Blueprint)" as SR
+participant "/api/v1/auth/sign-up route\n (Flask Blueprint)" as ASR
 participant "UserService" as US
 participant "EmailVerificationService" as ES
 participant "AuthService" as AS
@@ -9,61 +9,61 @@ participant "User Model Object \n (SQLAlchemy\n to Database)" as UM
 participant "External \n Email Service" as Mail
 
 == Sign up Process (User story #23) ==
-AppUser -> FE : Navigates to sign up form
+User -> FE : Navigates to sign up form
 activate FE
-AppUser <-- FE : Sign up form
+User <-- FE : Sign up form
 deactivate FE
-AppUser -> FE : Fills sign up form\n{email, plain_password, plain_password_confirm} and submits
+User -> FE : Fills sign up form\n{email, plain_password, plain_password_confirm} and submits
 activate FE
 FE -> FE : verify_passwords_match(plain_password, plain_password_confirm)
 activate FE
 alt Passwords do not match
     FE <-- FE : False
-    AppUser <-- FE : Error: Passwords do not match, try again
+    User <-- FE : Error: Passwords do not match, try again
 end
 FE <-- FE : True
 deactivate FE
-FE -> SR : HTTP Request: POST {email, plain_password}
+FE -> ASR : HTTP Request: POST {email, plain_password}
 deactivate FE
-activate SR
-SR -> ES : is_email_format_valid(email)
+activate ASR
+ASR -> ES : is_email_format_valid(email)
 activate ES
 alt Email format not valid
-    SR <-- ES : False
-    FE <-- SR : HTTP Response: 400 Bad Request (Email format not valid)
+    ASR <-- ES : False
+    FE <-- ASR : HTTP Response: 400 Bad Request (Email format not valid)
     activate FE
-    AppUser <-- FE : Error: Email format not valid, try again
+    User <-- FE : Error: Email format not valid, try again
     deactivate FE
 end
-SR <-- ES : True
+ASR <-- ES : True
 deactivate ES
-SR -> US : query_users_by_mail(email)
+ASR -> US : query_users_by_mail(email)
 activate US
 alt Account already exists
-    SR <-- US : User (object)
-    FE <-- SR : HTTP Response: 409 Conflict (User exists)
+    ASR <-- US : User (object)
+    FE <-- ASR : HTTP Response: 409 Conflict (User exists)
     activate FE
-    AppUser <-- FE : Error: account already exists, redirects to login page
+    User <-- FE : Error: account already exists, redirects to login page
     deactivate FE
 end
-SR <-- US : None
+ASR <-- US : None
 deactivate US
-SR -> AS : does_password_fulfill_requirements(plain_password)
+ASR -> AS : does_password_fulfill_requirements(plain_password)
 activate AS
 alt Password does not fulfill requirements
-    SR <-- AS : False
-    FE <-- SR : HTTP Response: 400 Bad Request (Password requirements not met)
+    ASR <-- AS : False
+    FE <-- ASR : HTTP Response: 400 Bad Request (Password requirements not met)
     activate FE
-    AppUser <-- FE : Error: Password requirements not met, try again
+    User <-- FE : Error: Password requirements not met, try again
     deactivate FE
 end
-SR <-- AS : True
+ASR <-- AS : True
 deactivate AS
-SR -> ES : create_verification_token()
+ASR -> ES : create_verification_token()
 activate ES
-SR <-- ES : verification_token
+ASR <-- ES : verification_token
 deactivate ES
-SR -> US : create_user(unverified_email, plain_password, plain_verification_token)
+ASR -> US : create_user(unverified_email, plain_password, plain_verification_token)
 activate US
 US -> UM : new(unverified_email, plain_password, plain_verification_token)
 activate UM
@@ -78,23 +78,23 @@ activate UM
 deactivate UM
 US <-- UM : User (object)
 deactivate UM
-SR <-- US : User (object)
+ASR <-- US : User (object)
 deactivate US
-SR -> ES : send_verification_mail(verification_token, unverified_email)
+ASR -> ES : send_verification_mail(verification_token, unverified_email)
 activate ES
 ES -> ES : __create_verification_link(plain_verification_token, unverified_email)
 activate ES
 deactivate ES
 ES -> Mail : send email {verification_link, email}
 activate Mail
-SR <-- ES : User (object)
+ASR <-- ES : User (object)
 deactivate ES
 deactivate ES
-FE <-- SR : HTTP Response: 201 Created (User created)
-deactivate SR
+FE <-- ASR : HTTP Response: 201 Created (User created)
+deactivate ASR
 activate FE
-AppUser <-- FE : Success Message and "check your mail"
+User <-- FE : Success Message and "check your mail"
 deactivate FE
-AppUser <- Mail : Mail with link
+User <- Mail : Mail with link
 deactivate Mail
 @enduml

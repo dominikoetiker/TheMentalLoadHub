@@ -1,42 +1,42 @@
 @startuml LoginSequence
-actor "User" as AppUser
+actor "User" as User
 participant "Frontend (React)" as FE
-participant "/login route\n(Flask Blueprint)" as LR
+participant "/api/v1/auth/login route\n(Flask Blueprint)" as ALiR
 participant "EmailVerificationService" as ES
 participant "AuthService" as AS
 participant "UserService" as US
 participant "User Model Object\n(SQLAlchemy to Database)" as UM
 
 == Login Process (User Story #25) ==
-AppUser -> FE: Submits login credentials
+User -> FE: Submits login credentials
 activate FE
-FE -> LR : HTTP Request: POST {email, plain_password, [user_agent, ip_address]}
+FE -> ALiR : HTTP Request: POST {email, plain_password, [user_agent, ip_address]}
 deactivate FE
-activate LR
-LR -> ES : is_email_format_valid(email)
+activate ALiR
+ALiR -> ES : is_email_format_valid(email)
 activate ES
 alt
 alt Email format not valid
-    LR <-- ES : False
-    FE <-- LR : HTTP Response: 404 Not Found
+    ALiR <-- ES : False
+    FE <-- ALiR : HTTP Response: 404 Not Found
     activate FE
-    AppUser <-- FE : Error: credentials not valid
+    User <-- FE : Error: credentials not valid
     deactivate FE
 end
-LR <-- ES : True
+ALiR <-- ES : True
 deactivate ES
-LR -> US : query_users_by_mail(email)
+ALiR -> US : query_users_by_mail(email)
 activate US
 alt Unverified Mail does not exist or expired
-    LR <-- US : None
-    FE <-- LR : HTTP Response: 404 Not Found
+    ALiR <-- US : None
+    FE <-- ALiR : HTTP Response: 404 Not Found
     activate FE
-    AppUser <-- FE : Error: credentials not valid
+    User <-- FE : Error: credentials not valid
     deactivate FE
 end
-LR <-- US : User object
+ALiR <-- US : User object
 deactivate US
-LR -> AS : verify_password(user, plain_password)
+ALiR -> AS : verify_password(user, plain_password)
 activate AS
 AS -> UM : verify_password(plain_password)
 activate UM
@@ -45,21 +45,21 @@ activate UM
 deactivate UM
 alt Password does not match
     AS <-- UM : False
-    LR <-- AS : False
-    FE <-- LR : HTTP Response: 404 Not Found
+    ALiR <-- AS : False
+    FE <-- ALiR : HTTP Response: 404 Not Found
     activate FE
-    AppUser <-- FE : Error: credentials not valid
+    User <-- FE : Error: credentials not valid
     deactivate FE
 end
 AS <-- UM : True
 deactivate UM
-LR <-- AS : True
+ALiR <-- AS : True
 deactivate AS
-note right of LR : Create JWT: see sep. generic diagram.
-FE <-- LR : HTTP Response: 200 OK {access_jwt, refresh_jwt}
-deactivate LR
+note right of ALiR : Create JWT: see sep. generic diagram.
+FE <-- ALiR : HTTP Response: 200 OK {access_jwt, refresh_jwt}
+deactivate ALiR
 activate FE
 FE -> FE : store access_jwt and refresh_jwt in HTTP only cookie
-AppUser <-- FE : Success: Login
+User <-- FE : Success: Login
 deactivate FE
 @enduml

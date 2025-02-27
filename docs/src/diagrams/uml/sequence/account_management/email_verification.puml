@@ -1,40 +1,40 @@
 @startuml EmailVerificationSequence
-actor "User" as AppUser
+actor "User" as User
 participant "Frontend (React)" as FE
-participant "/verify route\n (Flask Blueprint)" as VR
+participant "/api/v1/auth/verify route\n (Flask Blueprint)" as AVR
 participant "UserService" as US
 participant "EmailVerificationService" as ES
 participant "User Model Object \n (SQLAlchemy\n to Database)" as UM
 
 == E-Mail Verification (User stories #23, #27) ==
-AppUser -> FE : clicks link (send email and token)
+User -> FE : clicks link (send email and token)
 activate FE
-FE -> VR : HTTP Request: GET {email, plain_verification_token}
+FE -> AVR : HTTP Request: GET {email, plain_verification_token}
 deactivate FE
-activate VR
-VR -> ES : is_email_format_valid(email)
+activate AVR
+AVR -> ES : is_email_format_valid(email)
 activate ES
 alt Email format not valid
-    VR <-- ES : False
-    FE <-- VR : HTTP Response: 404 Not Found
+    AVR <-- ES : False
+    FE <-- AVR : HTTP Response: 404 Not Found
     activate FE
-    AppUser <-- FE : Error: link not valid
+    User <-- FE : Error: link not valid
     deactivate FE
 end
-VR <-- ES : True
+AVR <-- ES : True
 deactivate ES
-VR -> US : query_users_by_unverified_mail_and_not_expired_verification(unverified_email: str)
+AVR -> US : query_users_by_unverified_mail_and_not_expired_verification(unverified_email: str)
 activate US
 alt Unverified Mail does not exist or expired
-    VR <-- US : None
-    FE <-- VR : HTTP Response: 404 Not Found
+    AVR <-- US : None
+    FE <-- AVR : HTTP Response: 404 Not Found
     activate FE
-    AppUser <-- FE : Error: link not valid
+    User <-- FE : Error: link not valid
     deactivate FE
 end
-VR <-- US : User object
+AVR <-- US : User object
 deactivate US
-VR -> ES : verify_email(User, plain_verification_token)
+AVR -> ES : verify_email(User, plain_verification_token)
 activate ES
 ES -> UM : verify_verification_token(plain_verification_token)
 activate UM
@@ -43,10 +43,10 @@ activate UM
 deactivate UM
 alt verification token does not match
     ES <-- UM : False
-    VR <-- ES : False
-    FE <-- VR : HTTP Response: 404 Not Found
+    AVR <-- ES : False
+    FE <-- AVR : HTTP Response: 404 Not Found
     activate FE
-    AppUser <-- FE : Error: link not valid
+    User <-- FE : Error: link not valid
     deactivate FE
 end
 ES <-- UM : True
@@ -54,11 +54,11 @@ ES -> UM : is_user_verified = True
 ES -> UM : email = unverified_email
 ES -> UM : unverified_email = ""
 deactivate UM
-VR <-- ES : True
+AVR <-- ES : True
 deactivate ES
-FE <-- VR : HTTP Response: 200 OK (Email verified)
-deactivate VR
+FE <-- AVR : HTTP Response: 200 OK (Email verified)
+deactivate AVR
 activate FE
-AppUser <-- FE : Success Message and redirects to login page
+User <-- FE : Success Message and redirects to login page
 deactivate FE
 @enduml
