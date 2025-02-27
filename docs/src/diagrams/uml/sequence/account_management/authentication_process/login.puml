@@ -55,10 +55,7 @@ AS <-- UM : True
 deactivate UM
 LR <-- AS : True
 deactivate AS
-
 note right of LR : Create JWT: see sep. generic diagram.
-
-
 FE <-- LR : HTTP Response: 200 OK {access_jwt, refresh_jwt}
 deactivate LR
 activate FE

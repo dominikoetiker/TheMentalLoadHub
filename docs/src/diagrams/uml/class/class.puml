@@ -50,7 +50,6 @@ package "Model Classes" {
         + is_user_verified: bool
         + verification_exp_at: datetime.datetime
         - __hashed_reset_password_jwt: str
-        + was_reset_jwt_used: bool
         + created_at: datetime.datetime
         + updated_at: datetime.datetime
         + is_deleted: bool
@@ -368,12 +367,12 @@ package "Services Classes" {
     Class AuthService {
         + does_password_fulfill_requirements(plain_password: str): bool
         + verify_password(user: User, plain_password: str): bool
+        - __decode_jwt(jwt: str): str
         + create_jwt(user: User, user_agent: str, ip_address: str): Tuple[access_jwt: str, refresh_jwt: str]
         - __create_refresh_jwt(user: User): Tuple[refresh_jti: str, refresh_jwt: str]
         - __create_access_jwt(user: User, refresh_jti: str): str
         - __encode_jwt(jwt: str): str
         + verify_refresh_request(access_jwt, refresh_jwt): User
-        - __decode_jwt(jwt: str): str
         - __is_refresh_jwt(decoded_jwt: str): bool
         - __has_jwt_expired(decoded_jwt: str): bool
         - __query_blacklisted_jwt_by_jti(jti): BlacklistedJWTAccessToken
@@ -388,6 +387,8 @@ package "Services Classes" {
         + create_reset_password_jwt(user: User): str
         - send_reset_password_email(email: str, encoded_reset_password_jwt: str): None
         + __create_reset_password_link(reset_password_jwt: str): str
+        + verify_reset_password_jwt(encoded_reset_password_jwt: str): User
+        - __is_reset_password_jwt(decoded_jwt: str): bool
     }
     note bottom
         JWT Access Token Format:

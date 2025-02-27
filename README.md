@@ -51,8 +51,8 @@ design is refined based on feedback and testing.
       - [x] Login (#25): [LoginSequence.svg](docs/out/diagrams/uml/sequence/account_management/authentication_process/LoginSequence.svg)
       - [x] Logout (#26): [LogoutSequence.svg](docs/out/diagrams/uml/sequence/account_management/authentication_process/LogoutSequence.svg)
     - [x] Update account (#24, #27) [UpdateAccountSequence.svg](docs/out/diagrams/uml/sequence/account_management/UpdateAccountSequence.svg)
-    - [x] Reset password generate link (#28) [ResetPasswordSequence.svg](docs/out/diagrams/uml/sequence/account_management/ResetPasswordSequence.svg)
-    - [ ] Reset password use link (#28)
+    - [x] Reset password request (#28) [ResetPasswordRequestSequence.svg](docs/out/diagrams/uml/sequence/account_management/ResetPasswordRequestSequence.svg)
+    - [x] Reset password confirm (#28) [ResetPasswordConfirmSequence.svg](docs/out/diagrams/uml/sequence/account_management/ResetPasswordConfirmSequence.svg)
     - [ ] Delete account
   - [ ] **Household management**
     - [ ] Create household (#12, #13)

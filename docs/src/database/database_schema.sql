@@ -64,7 +64,6 @@ CREATE TABLE User
     is_user_verified          BOOLEAN      NOT NULL DEFAULT FALSE,
     verification_exp_at       DATETIME     NOT NULL,
     hashed_reset_password_jwt VARCHAR(255),
-    was_reset_jwt_used        BOOLEAN      NOT NULL DEFAULT FALSE,
     created_at                TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at                TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     is_deleted                BOOLEAN      NOT NULL DEFAULT FALSE,
