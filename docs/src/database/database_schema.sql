@@ -1,3 +1,4 @@
+DROP EVENT IF EXISTS delete_expired_refresh_tokens;
 DROP EVENT IF EXISTS delete_blacklisted_tokens;
 DROP TRIGGER IF EXISTS delete_task_at_project_delete;
 DROP TRIGGER IF EXISTS insert_child_table_record_at_task_insert;
@@ -21,6 +22,7 @@ DROP TABLE IF EXISTS AreaOfResponsibility;
 DROP TABLE IF EXISTS Household_User;
 DROP TABLE IF EXISTS User;
 DROP TABLE IF EXISTS Household;
+DROP TABLE IF EXISTS JWTRefreshTokenWhitelist;
 DROP TABLE IF EXISTS JWTAccessTokenBlacklist;
 
 
@@ -262,7 +264,7 @@ CREATE TABLE Task_TaskHelper
     is_deleted          BOOLEAN   NOT NULL DEFAULT FALSE,
     PRIMARY KEY (task_task_helper_id),
     FOREIGN KEY (task_id) REFERENCES Task (task_id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES USER (user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES User (user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE ShoppingList
@@ -343,8 +345,7 @@ BEGIN
     ELSEIF NEW.is_done = FALSE AND OLD.is_done = TRUE THEN
         SET NEW.done_at = NULL;
     END IF;
-END;
-//
+END //
 DELIMITER  ;
 
 DELIMITER //
@@ -358,8 +359,7 @@ BEGIN
     ELSEIF new.status != 4 AND old.status = 4 THEN
         SET new.done_at = NULL;
     END IF;
-END;
-//
+END //
 DELIMITER ;
 
 /*
@@ -377,8 +377,7 @@ BEGIN
     ELSE
         INSERT INTO NonRecurringTask (task_id) VALUES (NEW.task_id);
     END IF;
-END;
-//
+END //
 DELIMITER ;
 
 /*
@@ -394,8 +393,7 @@ BEGIN
     DELETE
     FROM Task
     WHERE task_id = OLD.task_id;
-END;
-//
+END //
 DELIMITER ;
 
 /*
