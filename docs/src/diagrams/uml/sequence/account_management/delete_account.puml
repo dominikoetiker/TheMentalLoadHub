@@ -1,0 +1,51 @@
+@startuml DeleteAccountSequence
+actor "Account User" as User
+participant "Frontend (React)" as FE
+participant "/delete_account route\n(Flask Blueprint)" as DR
+participant "UserService" as US
+participant "AuthService" as AS
+participant "User Model Object\n(SQLAlchemy to Database)" as UM
+
+== Delete Account Process ==
+User -> FE: Clicks "Delete Account" button
+activate FE
+User <-- FE: Confirmation dialog asking\nfor password and showing\nwarnings about data loss
+deactivate FE
+User -> FE: Enters password and confirms deletion
+activate FE
+FE -> DR: HTTP Request: DELETE {access_jwt, plain_password}
+deactivate FE
+activate DR
+note right of DR: Verify JWT: see sep. generic diagram.
+DR -> AS: verify_password(User, plain_password)
+activate AS
+AS -> UM: verify_password(plain_password)
+activate UM
+UM -> UM: __hash_secret(plain_password)
+activate UM
+deactivate UM
+alt Password does not match
+    AS <-- UM: False
+    DR <-- AS: False
+    FE <-- DR: HTTP Response: 401 Unauthorized
+    activate FE
+    User <-- FE: Error: Password incorrect, try again
+    deactivate FE
+end
+AS <-- UM: True
+deactivate UM
+DR <-- AS: True
+deactivate AS
+DR -> US: delete_user(User)
+activate US
+US -> UM: Set is_deleted = True
+activate UM
+deactivate UM
+deactivate US
+note right of DR: Revoke JWT: see sep. generic diagram.
+FE <-- DR: HTTP Response: 200 OK
+deactivate DR
+activate FE
+User <-- FE: Success message and redirect to home page
+deactivate FE
+@enduml

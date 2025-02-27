@@ -50,20 +50,24 @@ design is refined based on feedback and testing.
       - [x] Verify JWT: [VerifyJWTSequence.svg](docs/out/diagrams/uml/sequence/account_management/authentication_process/VerifyJWTSequence.svg)
       - [x] Login (#25): [LoginSequence.svg](docs/out/diagrams/uml/sequence/account_management/authentication_process/LoginSequence.svg)
       - [x] Logout (#26): [LogoutSequence.svg](docs/out/diagrams/uml/sequence/account_management/authentication_process/LogoutSequence.svg)
-    - [x] Update account (#24, #27) [UpdateAccountSequence.svg](docs/out/diagrams/uml/sequence/account_management/UpdateAccountSequence.svg)
-    - [x] Reset password request (#28) [ResetPasswordRequestSequence.svg](docs/out/diagrams/uml/sequence/account_management/ResetPasswordRequestSequence.svg)
-    - [x] Reset password confirm (#28) [ResetPasswordConfirmSequence.svg](docs/out/diagrams/uml/sequence/account_management/ResetPasswordConfirmSequence.svg)
-    - [ ] Delete account
+    - [x] Update account (#24, #27): [UpdateAccountSequence.svg](docs/out/diagrams/uml/sequence/account_management/UpdateAccountSequence.svg)
+    - [x] Reset password request (#28): [ResetPasswordRequestSequence.svg](docs/out/diagrams/uml/sequence/account_management/ResetPasswordRequestSequence.svg)
+    - [x] Reset password confirm (#28): [ResetPasswordConfirmSequence.svg](docs/out/diagrams/uml/sequence/account_management/ResetPasswordConfirmSequence.svg)
+    - [x] Delete account: [DeleteAccountSequence.svg](docs/out/diagrams/uml/sequence/account_management/DeleteAccountSequence.svg)
   - [ ] **Household management**
-    - [ ] Create household (#12, #13)
-    - [ ] Update household (#16)
-    - [ ] Delete household (#15)
-    - [ ] Add member (#18)
-    - [ ] Remove member (#19)
-    - [ ] Assign admin role (#20)
-    - [ ] Remove admin role
-    - [ ] View household members (#30)
-  - [ ] **Task management** -[ ] Create recurring task (#34, #35, #38, #39) -[ ] Create non recurring task (#34, #35, #41) -[ ] Update recurring task (#38, #39, #40, #45, #46, #47) -[ ] Update non recurring task (#41, #45, #47)
+    - [ ] Create household (#12, #13):
+    - [ ] Update household (#16):
+    - [ ] Delete household (#15):
+    - [ ] Add member (#18):
+    - [ ] Remove member (#19):
+    - [ ] Assign admin role (#20):
+    - [ ] Remove admin role:
+    - [ ] View household members (#30):
+  - [ ] **Task management**
+    - [ ] Create recurring task (#34, #35, #38, #39):
+    - [ ] Create non recurring task (#34, #35, #41):
+    - [ ] Update recurring task (#38, #39, #40, #45, #46, #47):
+    - [ ] Update non recurring task (#41, #45, #47):
 
 ## License
 

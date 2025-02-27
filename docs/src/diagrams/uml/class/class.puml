@@ -368,11 +368,11 @@ package "Services Classes" {
         + does_password_fulfill_requirements(plain_password: str): bool
         + verify_password(user: User, plain_password: str): bool
         - __decode_jwt(jwt: str): str
-        + create_jwt(user: User, user_agent: str, ip_address: str): Tuple[access_jwt: str, refresh_jwt: str]
-        - __create_refresh_jwt(user: User): Tuple[refresh_jti: str, refresh_jwt: str]
+        + create_jwt(user: User, user_agent: str, ip_address: str): Tuple[access_jwt: str, encoded_refresh_jwt: str]
+        - __create_refresh_jwt(user: User): Tuple[refresh_jti: str, encoded_refresh_jwt: str]
         - __create_access_jwt(user: User, refresh_jti: str): str
         - __encode_jwt(jwt: str): str
-        + verify_refresh_request(access_jwt, refresh_jwt): User
+        + verify_refresh_request(access_jwt: str, encoded_refresh_jwt: str): User
         - __is_refresh_jwt(decoded_jwt: str): bool
         - __has_jwt_expired(decoded_jwt: str): bool
         - __query_blacklisted_jwt_by_jti(jti): BlacklistedJWTAccessToken
@@ -447,6 +447,7 @@ package "Services Classes" {
         + create_user(unverified_email: str, plain_password: str, plain_verification_token: str): User
         + update_user_email(user: User, new_email: str, plain_verification_token: str): None
         + update_user_password(user: User, new_plain_password: str): None
+        + delete_user(user: User): None
     }
 
     Class HouseholdService {
