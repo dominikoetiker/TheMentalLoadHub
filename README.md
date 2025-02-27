@@ -25,9 +25,13 @@ design is refined based on feedback and testing.
 
 ## Planned Tech Stack
 
-- **Database:** MariaDB
+- **Database:** MariaDB or MySQL
 - **Backend:** Python with Flask
+  - ORM: SQLAlchemy
+  - API: REST
+  - Authentication token: JWT
 - **Frontend:** TypeScript with React
+  - Components library: Mantine UI
 - **Mobile:** React Native
 
 ## Draft the app (Diagrams)
@@ -40,7 +44,7 @@ design is refined based on feedback and testing.
   - [x] Model Relations: [BackendClasses-page2.svg](docs/out/diagrams/uml/class/BackendClasses-page2.svg)
   - [ ] Service Classes: [BackendClasses-page3.svg](docs/out/diagrams/uml/class/BackendClasses-page3.svg)
 - [ ] **Sequence Diagrams**
-  - [ ] **Account management**
+  - [x] **Account management**
     - [x] Sign up (#23): [SignUpSequence.svg](docs/out/diagrams/uml/sequence/account_management/SignUpSequence.svg)
     - [x] Email verification (#23, 27): [EmailVerificationSequence.svg](docs/out/diagrams/uml/sequence/account_management/EmailVerificationSequence.svg)
     - [x] **Authentication process**
